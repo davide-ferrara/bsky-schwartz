@@ -77,3 +77,13 @@ defining:
 6. **Phase 6:** Implement Labeler and Feed Generator services.
 
 ---
+
+## 6. Build & Lint Commands
+
+- **Build:** `make build`
+- **Run:** `make run`
+- **Clean:** `make clean`
+
+Always use `make build` to compile instead of `go build` directly.
+
+---

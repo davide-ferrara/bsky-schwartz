@@ -15,6 +15,12 @@ import (
 
 type Scheduler struct{}
 
+type Record struct {
+	Type  string   `json:"type"`
+	Text  string   `json:"text"`
+	Langs []string `json:"langs"`
+}
+
 func (s *Scheduler) printRecord(record *Record) {
 	fmt.Printf("Text: %v\nLangs: %v\n", record.Text, record.Langs)
 }
