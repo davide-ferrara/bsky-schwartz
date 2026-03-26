@@ -39,10 +39,16 @@ type FeedItem struct {
 	Images        []EmbedImage   `json:"images"`
 	External      *EmbedExternal `json:"external"`
 	QuotedPostURI string         `json:"quoted_post_uri"`
-	Prompt        string         `json:"prompt"`
 	Values        SchwartzValues `json:"values"`
 	ValuesArr     []int          `json:"values_arr"`
 	Score         float64        `json:"score"`
+	Stats         RequestStats   `json:"stats,omitempty"`
+}
+
+type RequestStats struct {
+	ResponseTimeMs int64   `json:"response_time_ms"`
+	TokensUsed     int     `json:"tokens_used"`
+	CostUsd        float64 `json:"cost_usd"`
 }
 
 type Config struct {

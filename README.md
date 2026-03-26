@@ -4,7 +4,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![Paper](https://img.shields.io/badge/Paper-arXiv:2509.14434-B31B1B?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/pdf/2509.14434)
 
-**AI-Powered Social Media Content Analysis based on Schwartz Theory of Basic Human Values**
+**AI-Powered Social Media Content Analysis based on Schwartz Theory of Basic
+Human Values**
 
 bsky-schwartz is a Go application that analyzes Bluesky posts using the
 [Schwartz Theory of Basic Human Values](https://en.wikipedia.org/wiki/Schwartz_theory_of_basic_human_values).
@@ -13,10 +14,10 @@ calculates alignment scores.
 
 ## Background
 
-This project is inspired by the paper ["Using Large Language Models to Assess
-Human Values in Social Media"](https://arxiv.org/abs/2509.14434) which explores
-how LLMs can be used to analyze and quantify human values expressed in social
-media content.
+This project is inspired by the paper
+["Using Large Language Models to Assess Human Values in Social Media"](https://arxiv.org/abs/2509.14434)
+which explores how LLMs can be used to analyze and quantify human values
+expressed in social media content.
 
 ## Overview
 
@@ -158,19 +159,39 @@ make test
 
 ## API Reference
 
+### Examples
+
+```bash
+# Health check
+curl http://localhost:8080/health
+
+# Search posts and analyze with Schwartz values
+curl "http://localhost:8080/api/analysis?query=cats&limit=2&model=qwen"
+
+# Search and return only post URIs
+curl "http://localhost:8080/api/search?query=cats&limit=10"
+
+# Get a single post by URI and analyze
+curl "http://localhost:8080/api/analysis/by-uri?uri=at://did:plc:d5v2lwniz6g57usqe2fzxzgt/app.bsky.feed.post/3mhvowobwbc2g&model=qwen"
+```
+
 ### Endpoints
 
-| Method | Endpoint  | Description  |
-| ------ | --------- | ------------ |
-| `GET`  | `/health` | Health check |
+| Method | Endpoint               | Description                            |
+| ------ | ---------------------- | -------------------------------------- |
+| `GET`  | `/health`              | Health check                           |
+| `GET`  | `/api/analysis`        | Search posts and analyze with Schwartz |
+| `GET`  | `/api/search`          | Search and return only post URIs       |
+| `GET`  | `/api/analysis/by-uri` | Get a single post by URI and analyze   |
 
 ### Query Parameters
 
-| Parameter | Type   | Default | Description     |
-| --------- | ------ | ------- | --------------- |
-| `query`   | string | `test`  | Search query    |
-| `limit`   | int    | `10`    | Number of posts |
-| `model`   | string | `gpt`   | AI model to use |
+| Parameter | Type   | Default | Description                                       |
+| --------- | ------ | ------- | ------------------------------------------------- |
+| `query`   | string | -       | Search query                                      |
+| `limit`   | int    | `10`    | Number of posts                                   |
+| `model`   | string | `gpt`   | AI model to use                                   |
+| `uri`     | string | -       | Post AT Protocol URI (for `/api/analysis/by-uri`) |
 
 ## Scoring System
 

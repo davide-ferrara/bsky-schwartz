@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	openrouter "github.com/revrost/go-openrouter"
 )
@@ -65,45 +66,50 @@ func stripMarkdownCodeFences(data []byte) []byte {
 	return []byte(strings.TrimSpace(text))
 }
 
-func (f *FeedItem) generatePrompt() error {
+func (f *FeedItem) generatePrompt() (string, error) {
 	config := GetConfig()
-	prompt, err := os.ReadFile(config.Ai["prompt"])
+	promptData, err := os.ReadFile(config.Ai["prompt"])
 	if err != nil {
-		return fmt.Errorf("error reading PROMPT.MD")
+		return "", fmt.Errorf("error reading PROMPT.MD")
 	}
 
-	schwartz, err := os.ReadFile(config.Ai["schwartz"])
+	schwartzData, err := os.ReadFile(config.Ai["schwartz"])
 	if err != nil {
-		return fmt.Errorf("error reading SCHWARTZ.MD")
+		return "", fmt.Errorf("error reading SCHWARTZ.MD")
 	}
 
-	f.Prompt = fmt.Sprintf("%s\n---BEGIN POST---\n%s\n---END POST---\n%s", schwartz, f.Text, prompt)
-
-	return nil
+	return fmt.Sprintf("%s\n---BEGIN POST---\n%s\n---END POST---\n%s", schwartzData, f.Text, promptData), nil
 }
 
 // Using Schwartz Values it ask to the selected mododel how are they reflected inside the post
 func (f *FeedItem) ValueAlignment(model string) error {
-	// start := time.Now()
-	err := f.generatePrompt()
+	start := time.Now()
+
+	prompt, err := f.generatePrompt()
 	if err != nil {
 		return err
 	}
 
 	client := getORClient()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	aiResp, err := client.CreateChatCompletion(
-		context.Background(),
+		ctx,
 		openrouter.ChatCompletionRequest{
 			Model:       model,
 			Temperature: 0,
 			Messages: []openrouter.ChatCompletionMessage{
-				openrouter.UserMessage(f.Prompt),
+				openrouter.UserMessage(prompt),
 			},
 		},
 	)
 	if err != nil {
 		return fmt.Errorf("openrouter client error: %v", err)
 	}
+
+	elapsed := time.Since(start)
 
 	data := []byte(aiResp.Choices[0].Message.Content.Text)
 
@@ -115,13 +121,14 @@ func (f *FeedItem) ValueAlignment(model string) error {
 	}
 
 	f.ValuesArr = f.Values.ToArray()
-
 	f.calculateScore()
 
-	// GlobalStats.TotalCost += resp.Usage.Cost
-	// GlobalStats.TotalTokens += resp.Usage.PromptTokens + resp.Usage.CompletionTokens
-	// GlobalStats.TotalTime += elapsed
-	// GlobalStats.RequestCount++
+	f.Stats = RequestStats{
+		ResponseTimeMs: elapsed.Milliseconds(),
+		TokensUsed:     aiResp.Usage.TotalTokens,
+		CostUsd:        aiResp.Usage.Cost,
+	}
+
 	return nil
 }
 

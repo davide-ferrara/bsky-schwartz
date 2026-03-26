@@ -83,6 +83,19 @@ func (c Client) QueryPosts(query string, limit int64) []scorer.FeedItem {
 	return items
 }
 
+func (c Client) GetPostsUri(query string, limit int64) []string {
+	res, err := bsky.FeedSearchPosts(context.Background(), c.client, "", "", "", "it", limit, "", query, "", "top", nil, "", "")
+	if err != nil {
+		panic(err)
+	}
+	var uris []string
+	for _, post := range res.Posts {
+		uris = append(uris, post.Uri)
+	}
+
+	return uris
+}
+
 func (c Client) LogPost(post *bsky.FeedDefs_PostView, feedPost *bsky.FeedPost) {
 	fmt.Printf("\n=== POST ===\n")
 	fmt.Printf("URI: %s\n", post.Uri)
@@ -168,4 +181,29 @@ func (c Client) GetReplies(postUri string) []string {
 		}
 	}
 	return replies
+}
+
+func (c Client) GetPost(postUri string) *scorer.FeedItem {
+	thread, err := bsky.FeedGetPostThread(context.Background(), c.client, 1, 0, postUri)
+	if err != nil {
+		fmt.Printf("Error getting post: %v\n", err)
+		return nil
+	}
+
+	if thread.Thread == nil || thread.Thread.FeedDefs_ThreadViewPost == nil {
+		return nil
+	}
+
+	viewPost := thread.Thread.FeedDefs_ThreadViewPost.Post
+	feedPost, ok := viewPost.Record.Val.(*bsky.FeedPost)
+	if !ok {
+		return nil
+	}
+
+	item := &scorer.FeedItem{
+		URI:  viewPost.Uri,
+		Text: feedPost.Text,
+	}
+
+	return item
 }

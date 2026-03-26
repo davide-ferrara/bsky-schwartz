@@ -34,19 +34,37 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/health", healthHandler)
-	router.GET("/search/post", searchHandler)
+	router.GET("/api/search", searchURIsHandler)
+	router.GET("/api/analysis", analysisHandler)
+	router.GET("/api/analysis/by-uri", analysisByUriHandler)
 
-	log.Println("Server starting on :8080")
 	if err := router.Run(":8080"); err != nil {
 		log.Fatalf("Could not start server: %v", err)
 	}
 }
 
-func healthHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+// Get a list of uri given specific query
+func searchURIsHandler(c *gin.Context) {
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "empty query"})
+		return
+	}
+
+	limitStr := c.DefaultQuery("limit", "1")
+
+	limit, err := strconv.ParseInt(limitStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid limit"})
+		return
+	}
+
+	feed := bskyClient.GetPostsUri(query, limit)
+	c.JSON(http.StatusOK, feed)
 }
 
-func searchHandler(c *gin.Context) {
+// Get feed with values
+func analysisHandler(c *gin.Context) {
 	query := c.DefaultQuery("query", "test")
 	limitStr := c.DefaultQuery("limit", "1")
 	modelKey := c.DefaultQuery("model", "gpt")
@@ -72,6 +90,40 @@ func searchHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, posts)
+}
+
+func healthHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
+// Get post with values from URI
+func analysisByUriHandler(c *gin.Context) {
+	uri := c.Query("uri")
+	if uri == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "empty uri"})
+		return
+	}
+
+	modelKey := c.DefaultQuery("model", "gpt")
+	model := scorer.GetConfig().Models[modelKey]
+	if model == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid model"})
+		return
+	}
+
+	post := bskyClient.GetPost(uri)
+	if post == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "post not found"})
+		return
+	}
+
+	if err := post.ValueAlignment(model); err != nil {
+		log.Printf("Error analyzing post %s: %v", post.URI, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to analyze post"})
+		return
+	}
+
+	c.JSON(http.StatusOK, post)
 }
 
 func getEnv(key string) string {
