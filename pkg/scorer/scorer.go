@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	openrouter "github.com/revrost/go-openrouter"
@@ -54,6 +55,16 @@ func getORClient() *openrouter.Client {
 	return openrouter.NewClient(key)
 }
 
+func stripMarkdownCodeFences(data []byte) []byte {
+	text := string(data)
+	text = strings.TrimSpace(text)
+	text = strings.TrimPrefix(text, "```json")
+	text = strings.TrimPrefix(text, "```")
+	text = strings.TrimSuffix(text, "```")
+	text = strings.TrimSuffix(text, "```json")
+	return []byte(strings.TrimSpace(text))
+}
+
 func (f *FeedItem) generatePrompt() error {
 	config := GetConfig()
 	prompt, err := os.ReadFile(config.Ai["prompt"])
@@ -95,17 +106,15 @@ func (f *FeedItem) ValueAlignment(model string) error {
 	}
 
 	data := []byte(aiResp.Choices[0].Message.Content.Text)
+
+	data = stripMarkdownCodeFences(data)
+
 	err = json.Unmarshal(data, &f.Values)
 	if err != nil {
-		return fmt.Errorf("unmarshal error: %v", err)
+		return fmt.Errorf("unmarshal error: %v, data: %s", err, string(data))
 	}
 
-	values, err := parseSchwartzValues(data)
-	if err != nil {
-		return fmt.Errorf("values parse error: %v", err)
-	}
-
-	f.ValuesArr = values.ToArray()
+	f.ValuesArr = f.Values.ToArray()
 
 	f.calculateScore()
 
@@ -117,12 +126,12 @@ func (f *FeedItem) ValueAlignment(model string) error {
 }
 
 func (f *FeedItem) calculateScore() {
-	var score float64
-	w := weightsToArray()
-	v := f.ValuesArr
+	weights := weightsToArray()
+	values := f.ValuesArr
 
-	for i := range v {
-		f.Score += float64(v[i]) * w[i]
+	var score float64
+	for i := range values {
+		score += float64(values[i]) * weights[i]
 	}
 
 	f.Score = score

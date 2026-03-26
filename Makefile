@@ -7,7 +7,7 @@ run:
 	cd $(PROJECT_DIR) && go run ./cmd/server
 
 build:
-	go build -o $(BIN_DIR)/bsky-schwartz ./cmd/server
+	go build -o $(BIN_DIR)/server ./cmd/server
 
 clean:
 	rm -rf $(BIN_DIR)
