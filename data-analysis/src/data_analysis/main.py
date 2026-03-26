@@ -8,7 +8,7 @@ from .charts import plot_value_differences, plot_cluster_differences
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Benchmark tool for comparing GPT vs Qwen Schwartz value analysis"
+        description="Benchmark tool for comparing GPT vs Minimax Schwartz value analysis"
     )
     parser.add_argument(
         "--base-url",
@@ -64,19 +64,19 @@ def main():
     gpt_results = [analyzer.analyze_uri(uri, "gpt") for uri in uris]
     gpt_results = [r for r in gpt_results if r is not None]
 
-    print("Analyzing with Qwen...")
-    qwen_results = [analyzer.analyze_uri(uri, "qwen") for uri in uris]
-    qwen_results = [r for r in qwen_results if r is not None]
+    print("Analyzing with Minimax...")
+    minimax_results = [analyzer.analyze_uri(uri, "minimax") for uri in uris]
+    minimax_results = [r for r in minimax_results if r is not None]
 
-    if not gpt_results or not qwen_results:
+    if not gpt_results or not minimax_results:
         print("Error: No results from one or both models")
         sys.exit(1)
 
-    results = {"gpt": gpt_results, "qwen": qwen_results}
+    results = {"gpt": gpt_results, "minimax": minimax_results}
 
     diffs = analyzer.compute_differences(results)
 
-    print("\nValue Differences (GPT - Qwen):")
+    print("\nValue Differences (GPT - Minimax):")
     for val, diff in sorted(diffs.items(), key=lambda x: abs(x[1]), reverse=True):
         sign = "+" if diff >= 0 else ""
         print(f"  {val}: {sign}{diff:.2f}")
@@ -86,13 +86,13 @@ def main():
         plot_cluster_differences(
             cluster_diffs,
             output_path=args.output,
-            title="GPT vs Qwen: Cluster Differences",
+            title="GPT vs Minimax: Cluster Differences",
         )
     else:
         plot_value_differences(
             diffs,
             output_path=args.output,
-            title="GPT vs Qwen: Value Differences",
+            title="GPT vs Minimax: Value Differences",
         )
 
     print(f"\nResults saved to {args.output}")

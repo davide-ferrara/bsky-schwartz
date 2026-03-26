@@ -22,3 +22,5 @@ go.work
 
 # Environment
 .env
+data-analysis/__pycache__/
+data-analysis/*.png

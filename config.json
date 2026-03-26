@@ -1,7 +1,9 @@
 {
   "models": {
     "gpt": "openai/gpt-4o-mini",
-    "qwen": "qwen/qwen-2.5-72b-instruct"
+    "qwen": "qwen/qwen-2.5-72b-instruct",
+    "qwen3": "qwen/qwen3.5-35b-a3b",
+    "minimax": "minimax/minimax-m2.5"
   },
   "weights": {
     "left": {

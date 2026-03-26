@@ -1,6 +1,6 @@
 # Data Analysis Tool
 
-Benchmark tool for comparing GPT vs Qwen Schwartz value analysis on Bluesky posts.
+Benchmark tool for comparing GPT vs Minimax Schwartz value analysis on Bluesky posts.
 
 ## Setup
 
@@ -61,9 +61,9 @@ uv run python -m data_analysis.main \
 
 ## Output
 
-The tool generates a bar chart showing the difference between GPT and Qwen scores:
+The tool generates a bar chart showing the difference between GPT and Minimax scores:
 
-- **Green bars**: GPT scored higher than Qwen
-- **Red bars**: Qwen scored higher than GPT
+- **Green bars**: GPT scored higher than Minimax
+- **Red bars**: Minimax scored higher than GPT
 
 Each value is scored 0-6 according to Schwartz Theory of Basic Human Values.
