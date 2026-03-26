@@ -3,7 +3,11 @@ import sys
 
 from .api_client import APIClient
 from .analyzer import Analyzer
-from .charts import plot_value_differences, plot_cluster_differences
+from .charts import (
+    plot_value_comparison,
+    plot_value_differences,
+    plot_cluster_differences,
+)
 
 
 def main():
@@ -31,8 +35,13 @@ def main():
     )
     parser.add_argument(
         "--output",
-        default="diff_chart.png",
+        default="comparison_chart.png",
         help="Output PNG file path",
+    )
+    parser.add_argument(
+        "--diff",
+        action="store_true",
+        help="Show difference chart instead of side-by-side comparison",
     )
     parser.add_argument(
         "--clusters",
@@ -74,25 +83,60 @@ def main():
 
     results = {"gpt": gpt_results, "minimax": minimax_results}
 
-    diffs = analyzer.compute_differences(results)
+    if args.diff:
+        diffs = analyzer.compute_differences(results)
+        print("\nValue Differences (GPT - Minimax):")
+        for val, diff in sorted(diffs.items(), key=lambda x: abs(x[1]), reverse=True):
+            sign = "+" if diff >= 0 else ""
+            print(f"  {val}: {sign}{diff:.2f}")
 
-    print("\nValue Differences (GPT - Minimax):")
-    for val, diff in sorted(diffs.items(), key=lambda x: abs(x[1]), reverse=True):
-        sign = "+" if diff >= 0 else ""
-        print(f"  {val}: {sign}{diff:.2f}")
-
-    if args.clusters:
-        cluster_diffs = analyzer.compute_cluster_diffs(diffs)
-        plot_cluster_differences(
-            cluster_diffs,
-            output_path=args.output,
-            title="GPT vs Minimax: Cluster Differences",
-        )
+        if args.clusters:
+            cluster_diffs = analyzer.compute_cluster_diffs(diffs)
+            plot_cluster_differences(
+                cluster_diffs,
+                output_path=args.output,
+                title="GPT vs Minimax: Cluster Differences",
+            )
+        else:
+            plot_value_differences(
+                diffs,
+                output_path=args.output,
+                title="GPT vs Minimax: Value Differences",
+            )
     else:
-        plot_value_differences(
-            diffs,
+        print("\nAverage Scores:")
+        values_list = [
+            "sd_thought",
+            "sd_action",
+            "stimulation",
+            "hedonism",
+            "achievement",
+            "dominance",
+            "resources",
+            "face",
+            "personal_sec",
+            "societal_sec",
+            "tradition",
+            "rule_conf",
+            "inter_conf",
+            "humility",
+            "caring",
+            "dependability",
+            "universalism",
+            "nature",
+            "tolerance",
+        ]
+        for val in values_list:
+            gpt_scores = [r.values.get(val, 0) for r in gpt_results]
+            mm_scores = [r.values.get(val, 0) for r in minimax_results]
+            gpt_avg = sum(gpt_scores) / len(gpt_scores) if gpt_scores else 0
+            mm_avg = sum(mm_scores) / len(mm_scores) if mm_scores else 0
+            print(f"  {val}: GPT={gpt_avg:.2f}, Minimax={mm_avg:.2f}")
+
+        plot_value_comparison(
+            results,
             output_path=args.output,
-            title="GPT vs Minimax: Value Differences",
+            title="GPT vs Minimax: Value Comparison",
         )
 
     print(f"\nResults saved to {args.output}")

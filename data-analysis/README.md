@@ -56,12 +56,18 @@ uv run python -m data_analysis.main \
 | `--query` | Search query to get post URIs |
 | `--limit` | Number of posts to fetch (default: 10) |
 | `--uris` | Comma-separated list of post URIs |
-| `--output` | Output PNG file path (default: diff_chart.png) |
+| `--output` | Output PNG file path (default: comparison_chart.png) |
+| `--diff` | Show difference chart instead of side-by-side comparison |
 | `--clusters` | Show cluster-level differences instead of individual values |
 
 ## Output
 
-The tool generates a bar chart showing the difference between GPT and Minimax scores:
+By default, the tool generates a **side-by-side comparison chart** showing absolute scores:
+
+- **Blue bars**: GPT scores
+- **Orange bars**: Minimax scores
+
+Use `--diff` flag to show a **difference chart** instead:
 
 - **Green bars**: GPT scored higher than Minimax
 - **Red bars**: Minimax scored higher than GPT
