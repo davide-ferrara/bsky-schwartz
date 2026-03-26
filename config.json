@@ -1,0 +1,33 @@
+{
+  "models": {
+    "gpt": "openai/gpt-4o-mini",
+    "qwen": "qwen/qwen-2.5-72b-instruct"
+  },
+  "weights": {
+    "left": {
+      "Self-directed thoughts": 0,
+      "Self-directed actions": 0,
+      "Stimulation": -1,
+      "Hedonism": -5,
+      "Achievement": -5,
+      "Dominance": -2,
+      "Resources": -5,
+      "Face": -4,
+      "Personal security": -1,
+      "Societal security": 2.0,
+      "Tradition": -5.0,
+      "Rule conformity": 0.0,
+      "Interpersonal conformity": 5.0,
+      "Humility": 5.0,
+      "Caring": 5.0,
+      "Dependability": 5.0,
+      "Universal concern": 5.0,
+      "Preservation of nature": 5.0,
+      "Tolerance": 5.0
+    }
+  },
+  "ai": {
+    "prompt": "data/PROMPT.md",
+    "schwartz": "data/SCHWARTZ.md"
+  }
+}
