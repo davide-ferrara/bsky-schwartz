@@ -33,17 +33,18 @@ type EmbedExternal struct {
 }
 
 type FeedItem struct {
-	URI           string         `json:"uri"`
-	Text          string         `json:"text"`
-	Replies       []string       `json:"replies"`
-	Images        []EmbedImage   `json:"images"`
-	External      *EmbedExternal `json:"external"`
-	QuotedPostURI string         `json:"quoted_post_uri"`
-	Values        SchwartzValues `json:"values"`
-	ValuesArr     []int          `json:"values_arr"`
-	Score         float64        `json:"score"`
-	Model         string         `json:"model"`
-	Stats         RequestStats   `json:"stats,omitempty"`
+	URI            string         `json:"uri"`
+	Text           string         `json:"text"`
+	Replies        []string       `json:"replies"`
+	Images         []EmbedImage   `json:"images"`
+	External       *EmbedExternal `json:"external"`
+	QuotedPostURI  string         `json:"quoted_post_uri"`
+	Values         SchwartzValues `json:"values"`
+	ValuesArr      []int          `json:"values_arr"`
+	Score          float64        `json:"score"`
+	ScorePenalized float64        `json:"score_penalized"`
+	Model          string         `json:"model"`
+	Stats          RequestStats   `json:"stats,omitempty"`
 }
 
 type RequestStats struct {

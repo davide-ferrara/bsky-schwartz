@@ -132,7 +132,8 @@ func (f *FeedItem) ValueAlignment(model string) error {
 	}
 
 	f.ValuesArr = f.Values.ToArray()
-	f.calculateScore()
+	f.calculateScoreSimple()
+	f.calculateScorePenalized()
 	f.Model = model
 
 	f.Stats = RequestStats{
@@ -146,12 +147,13 @@ func (f *FeedItem) ValueAlignment(model string) error {
 		"tokens_used", aiResp.Usage.TotalTokens,
 		"cost_usd", aiResp.Usage.Cost,
 		"score", f.Score,
+		"score_penalized", f.ScorePenalized,
 	)
 
 	return nil
 }
 
-func (f *FeedItem) calculateScore() {
+func (f *FeedItem) calculateScoreSimple() {
 	weights := weightsToArray()
 	values := f.ValuesArr
 
@@ -163,21 +165,23 @@ func (f *FeedItem) calculateScore() {
 	f.Score = score
 }
 
-// func (f *FeedItem) CalculateScoreCustom(weights []float64) {
-// 	var score float64
-// 	penalty := 2.0
-//
-// 	for i, val := range f.ValuesArr {
-// 		weight := weights[i]
-// 		if weight > 0 {
-// 			score += float64(val) * weight
-// 		} else if weight < 0 {
-// 			score += float64(val) * weight * penalty
-// 		}
-// 	}
-//
-// 	f.Score = score
-// }
+func (f *FeedItem) calculateScorePenalized() {
+	weights := weightsToArray()
+	values := f.ValuesArr
+	penalty := 2.0
+
+	var score float64
+	for i := range values {
+		weight := weights[i]
+		if weight > 0 {
+			score += float64(values[i]) * weight
+		} else if weight < 0 {
+			score += float64(values[i]) * weight * penalty
+		}
+	}
+
+	f.ScorePenalized = score
+}
 
 func parseSchwartzValues(data []byte) (*SchwartzValues, error) {
 	var v SchwartzValues
