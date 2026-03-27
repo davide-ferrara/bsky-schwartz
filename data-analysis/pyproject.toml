@@ -1,16 +1,10 @@
 [project]
 name = "data-analysis"
 version = "0.1.0"
-description = "Benchmark tool for comparing GPT vs Qwen Schwartz value analysis"
-requires-python = ">=3.11"
+description = "Benchmark tool for comparing AI models on Schwartz values"
+readme = "README.md"
+requires-python = ">=3.14"
 dependencies = [
-    "requests",
-    "pandas",
     "matplotlib",
+    "numpy",
 ]
-
-[project.scripts]
-data-analysis = "data_analysis.main:main"
-
-[tool.uv]
-package = true
