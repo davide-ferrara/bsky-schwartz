@@ -72,8 +72,8 @@ func searchURIsHandler(c *gin.Context) {
 		return
 	}
 
-	feed := bskyClient.GetPostsUri(query, limit)
-	c.JSON(http.StatusOK, feed)
+	urls := bskyClient.GetPostsURL(query, limit)
+	c.JSON(http.StatusOK, urls)
 }
 
 func analysisHandler(c *gin.Context) {

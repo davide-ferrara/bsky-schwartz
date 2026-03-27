@@ -110,7 +110,7 @@ func (c Client) QueryPosts(query string, limit int64) []scorer.FeedItem {
 	return items
 }
 
-func (c Client) GetPostsUri(query string, limit int64) []string {
+func (c Client) GetPostsURIs(query string, limit int64) []string {
 	logger.Info("bluesky uri search started", "query", query, "limit", limit)
 	start := time.Now()
 
@@ -132,6 +132,41 @@ func (c Client) GetPostsUri(query string, limit int64) []string {
 	)
 
 	return uris
+}
+
+func (c Client) GetPostsURL(query string, limit int64) []string {
+	logger.Info("bluesky url search started", "query", query, "limit", limit)
+	start := time.Now()
+
+	res, err := bsky.FeedSearchPosts(context.Background(), c.client, "", "", "", "it", limit, "", query, "", "top", nil, "", "")
+	if err != nil {
+		logger.Error("bluesky url search failed", "error", err, "query", query)
+		panic(err)
+	}
+
+	var urls []string
+	for _, post := range res.Posts {
+		// Extract post ID from AT URI: at://did:plc:xxx/app.bsky.feed.post/POSTID
+		uriParts := strings.Split(post.Uri, "/")
+		if len(uriParts) < 5 {
+			logger.Warn("invalid post URI format", "uri", post.Uri)
+			continue
+		}
+		postID := uriParts[len(uriParts)-1]
+
+		// Build Bluesky URL: https://bsky.app/profile/handle/post/POSTID
+		handle := post.Author.Handle
+		url := fmt.Sprintf("https://bsky.app/profile/%s/post/%s", handle, postID)
+		urls = append(urls, url)
+	}
+
+	logger.Info("bluesky url search completed",
+		"query", query,
+		"found_urls", len(urls),
+		"duration_ms", time.Since(start).Milliseconds(),
+	)
+
+	return urls
 }
 
 func (c Client) GetReplies(postUri string) []string {
