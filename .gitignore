@@ -32,3 +32,7 @@ bin/
 data-analysis/__pycache__/
 data-analysis/*.png
 data-analysis/.venv/
+
+# Data analysis feeds and results
+data-analysis/feeds/*.json
+data-analysis/results/
