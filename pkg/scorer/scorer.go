@@ -101,7 +101,7 @@ func (f *FeedItem) ValueAlignment(model string) error {
 
 	client := getORClient()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 
 	aiResp, err := client.CreateChatCompletion(

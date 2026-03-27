@@ -34,6 +34,6 @@
     "schwartz": "data/SCHWARTZ.md"
   },
   "workers": {
-    "max_concurrent": 10
+    "max_concurrent": 5
   }
 }
