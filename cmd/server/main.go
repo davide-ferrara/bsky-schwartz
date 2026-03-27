@@ -8,6 +8,8 @@ import (
 	"strconv"
 
 	"bsky-schwarz/pkg/bluesky"
+	"bsky-schwarz/pkg/logger"
+	"bsky-schwarz/pkg/middleware"
 	"bsky-schwarz/pkg/scorer"
 
 	"github.com/gin-gonic/gin"
@@ -22,9 +24,14 @@ func main() {
 		panic(fmt.Errorf("failed to load .env: %w", err))
 	}
 
+	logLevel := getEnvOrDefault("LOG_LEVEL", "info")
+	logger.Init(logLevel)
+
 	if err := scorer.Init(); err != nil {
 		panic("failed to init scorer: " + err.Error())
 	}
+
+	logger.Info("server starting", "log_level", logLevel)
 
 	handle := getEnv("BSKY_HANDLE")
 	appPassword := getEnv("BSKY_APP_PASSWORD")
@@ -32,11 +39,14 @@ func main() {
 	bskyClient = bluesky.NewClient(handle, appPassword)
 
 	router := gin.Default()
+	router.Use(middleware.LoggingMiddleware())
 
 	router.GET("/health", healthHandler)
 	router.GET("/api/search", searchURIsHandler)
 	router.GET("/api/analysis", analysisHandler)
 	router.GET("/api/analysis/by-uri", analysisByUriHandler)
+
+	logger.Info("server listening", "port", 8080)
 
 	if err := router.Run(":8080"); err != nil {
 		log.Fatalf("Could not start server: %v", err)
@@ -65,9 +75,19 @@ func searchURIsHandler(c *gin.Context) {
 
 // Get feed with values
 func analysisHandler(c *gin.Context) {
-	query := c.DefaultQuery("query", "test")
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "empty query"})
+		return
+	}
+
 	limitStr := c.DefaultQuery("limit", "1")
-	modelKey := c.DefaultQuery("model", "gpt")
+
+	modelKey := c.Query("model")
+	if modelKey == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "empty model"})
+		return
+	}
 
 	model := scorer.GetConfig().Models[modelKey]
 	if model == "" {
@@ -83,6 +103,7 @@ func analysisHandler(c *gin.Context) {
 
 	posts := bskyClient.QueryPosts(query, limit)
 
+	// TODO: Collo di bottiglia
 	for i := range posts {
 		if err := posts[i].ValueAlignment(model); err != nil {
 			log.Printf("Error analyzing post %s: %v", posts[i].URI, err)
@@ -131,4 +152,11 @@ func getEnv(key string) string {
 		return v
 	}
 	panic("missing environment variable: " + key)
+}
+
+func getEnvOrDefault(key, defaultValue string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return defaultValue
 }

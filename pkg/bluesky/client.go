@@ -3,11 +3,13 @@ package bluesky
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/xrpc"
 
+	"bsky-schwarz/pkg/logger"
 	"bsky-schwarz/pkg/scorer"
 )
 
@@ -23,6 +25,7 @@ func NewClient(handle, appPassword string) Client {
 		Password:   appPassword,
 	})
 	if err != nil {
+		logger.Error("failed to create bluesky session", "error", err)
 		panic(fmt.Sprintf("Failed to create session: %v", err))
 	}
 
@@ -38,13 +41,25 @@ func NewClient(handle, appPassword string) Client {
 }
 
 func (c Client) QueryPosts(query string, limit int64) []scorer.FeedItem {
+	logger.Info("bluesky search started", "query", query, "limit", limit)
+	start := time.Now()
+
 	results, err := bsky.FeedSearchPosts(context.Background(), c.client, "", "", "", "it", limit, "", query, "", "top", nil, "", "")
 	if err != nil {
+		logger.Error("bluesky search failed", "error", err, "query", query)
 		panic(err)
 	}
 
+	logger.Info("bluesky search completed",
+		"query", query,
+		"found_posts", len(results.Posts),
+		"duration_ms", time.Since(start).Milliseconds(),
+	)
+
 	items := make([]scorer.FeedItem, 0, len(results.Posts))
-	for _, post := range results.Posts {
+	for i, post := range results.Posts {
+		postStart := time.Now()
+
 		feedPost := post.Record.Val.(*bsky.FeedPost)
 
 		item := scorer.FeedItem{
@@ -52,9 +67,11 @@ func (c Client) QueryPosts(query string, limit int64) []scorer.FeedItem {
 			Text: feedPost.Text,
 		}
 
-		if post.ReplyCount != nil && *post.ReplyCount > 0 {
-			item.Replies = c.GetReplies(post.Uri)
-		}
+		// Replies disabled: comments can distort post analysis
+		// Negative comments on positive posts shouldn't affect post ranking
+		// if post.ReplyCount != nil && *post.ReplyCount > 0 {
+		// 	item.Replies = c.GetReplies(post.Uri)
+		// }
 
 		if feedPost.Embed != nil {
 			if feedPost.Embed.EmbedImages != nil {
@@ -78,94 +95,60 @@ func (c Client) QueryPosts(query string, limit int64) []scorer.FeedItem {
 		}
 
 		items = append(items, item)
+
+		logger.Debug("post processed",
+			"index", i,
+			"post_uri", post.Uri,
+			"has_replies", item.Replies != nil,
+			"duration_ms", time.Since(postStart).Milliseconds(),
+		)
 	}
 
 	return items
 }
 
 func (c Client) GetPostsUri(query string, limit int64) []string {
+	logger.Info("bluesky uri search started", "query", query, "limit", limit)
+	start := time.Now()
+
 	res, err := bsky.FeedSearchPosts(context.Background(), c.client, "", "", "", "it", limit, "", query, "", "top", nil, "", "")
 	if err != nil {
+		logger.Error("bluesky uri search failed", "error", err, "query", query)
 		panic(err)
 	}
+
 	var uris []string
 	for _, post := range res.Posts {
 		uris = append(uris, post.Uri)
 	}
 
+	logger.Info("bluesky uri search completed",
+		"query", query,
+		"found_uris", len(uris),
+		"duration_ms", time.Since(start).Milliseconds(),
+	)
+
 	return uris
 }
 
-func (c Client) LogPost(post *bsky.FeedDefs_PostView, feedPost *bsky.FeedPost) {
-	fmt.Printf("\n=== POST ===\n")
-	fmt.Printf("URI: %s\n", post.Uri)
-	fmt.Printf("CID: %s\n", post.Cid)
-	fmt.Printf("Author - Handle: %s\n", post.Author.Handle)
-	fmt.Printf("Author - DID: %s\n", post.Author.Did)
-	fmt.Printf("Author - DisplayName: %s\n", *post.Author.DisplayName)
-	fmt.Printf("Text: %s\n", feedPost.Text)
-	fmt.Printf("CreatedAt: %s\n", feedPost.CreatedAt)
-	fmt.Printf("Languages: %v\n", feedPost.Langs)
-	fmt.Printf("Tags: %v\n", feedPost.Tags)
-
-	if feedPost.Embed != nil {
-		if feedPost.Embed.EmbedImages != nil {
-			fmt.Printf("Embed - Images: %d\n", len(feedPost.Embed.EmbedImages.Images))
-			for i, img := range feedPost.Embed.EmbedImages.Images {
-				fmt.Printf("  Image %d - Alt: %s\n", i, img.Alt)
-			}
-		}
-		if feedPost.Embed.EmbedExternal != nil {
-			fmt.Printf("Embed - External:\n")
-			fmt.Printf("  URI: %s\n", feedPost.Embed.EmbedExternal.External.Uri)
-			fmt.Printf("  Title: %s\n", feedPost.Embed.EmbedExternal.External.Title)
-			fmt.Printf("  Description: %s\n", feedPost.Embed.EmbedExternal.External.Description)
-		}
-		if feedPost.Embed.EmbedRecord != nil {
-			fmt.Printf("Embed - Record (quoted post):\n")
-			fmt.Printf("  URI: %s\n", feedPost.Embed.EmbedRecord.Record.Uri)
-		}
-		if feedPost.Embed.EmbedVideo != nil {
-			fmt.Printf("Embed - Video present\n")
-		}
-	}
-
-	if feedPost.Reply != nil {
-		fmt.Printf("Reply - Root URI: %s\n", feedPost.Reply.Root.Uri)
-		fmt.Printf("Reply - Parent URI: %s\n", feedPost.Reply.Parent.Uri)
-	}
-
-	if feedPost.Facets != nil {
-		fmt.Printf("Facets count: %d\n", len(feedPost.Facets))
-	}
-
-	fmt.Printf("IndexedAt: %s\n", post.IndexedAt)
-	fmt.Printf("Labels: %v\n", post.Labels)
-	fmt.Printf("LikeCount: %d\n", *post.LikeCount)
-	fmt.Printf("RepostCount: %d\n", *post.RepostCount)
-	fmt.Printf("ReplyCount: %d\n", *post.ReplyCount)
-	fmt.Printf("QuoteCount: %d\n", *post.QuoteCount)
-
-	if *post.ReplyCount > 0 {
-		c.GetReplies(post.Uri)
-	}
-
-	fmt.Printf("\n")
-}
-
 func (c Client) GetReplies(postUri string) []string {
+	logger.Debug("fetching replies", "post_uri", postUri)
+	start := time.Now()
+
 	thread, err := bsky.FeedGetPostThread(context.Background(), c.client, 3, 0, postUri)
 	if err != nil {
-		fmt.Printf("Error getting thread: %v\n", err)
+		logger.Warn("failed to get thread", "error", err, "post_uri", postUri)
 		return nil
 	}
 
 	if thread.Thread == nil || thread.Thread.FeedDefs_ThreadViewPost == nil {
+		logger.Debug("no thread found", "post_uri", postUri)
 		return nil
 	}
 
 	viewPost := thread.Thread.FeedDefs_ThreadViewPost
 	if viewPost.Replies == nil {
+		logger.Debug("no replies found", "post_uri", postUri)
 		return nil
 	}
 
@@ -180,23 +163,35 @@ func (c Client) GetReplies(postUri string) []string {
 			}
 		}
 	}
+
+	logger.Debug("replies fetched",
+		"post_uri", postUri,
+		"count", len(replies),
+		"duration_ms", time.Since(start).Milliseconds(),
+	)
+
 	return replies
 }
 
 func (c Client) GetPost(postUri string) *scorer.FeedItem {
+	logger.Info("fetching single post", "post_uri", postUri)
+	start := time.Now()
+
 	thread, err := bsky.FeedGetPostThread(context.Background(), c.client, 1, 0, postUri)
 	if err != nil {
-		fmt.Printf("Error getting post: %v\n", err)
+		logger.Error("failed to get post", "error", err, "post_uri", postUri)
 		return nil
 	}
 
 	if thread.Thread == nil || thread.Thread.FeedDefs_ThreadViewPost == nil {
+		logger.Warn("post not found", "post_uri", postUri)
 		return nil
 	}
 
 	viewPost := thread.Thread.FeedDefs_ThreadViewPost.Post
 	feedPost, ok := viewPost.Record.Val.(*bsky.FeedPost)
 	if !ok {
+		logger.Warn("failed to parse post", "post_uri", postUri)
 		return nil
 	}
 
@@ -204,6 +199,11 @@ func (c Client) GetPost(postUri string) *scorer.FeedItem {
 		URI:  viewPost.Uri,
 		Text: feedPost.Text,
 	}
+
+	logger.Info("post fetched successfully",
+		"post_uri", postUri,
+		"duration_ms", time.Since(start).Milliseconds(),
+	)
 
 	return item
 }

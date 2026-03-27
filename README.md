@@ -193,6 +193,96 @@ curl "http://localhost:8080/api/analysis/by-uri?uri=at://did:plc:d5v2lwniz6g57us
 | `model`   | string | `gpt`   | AI model to use                                   |
 | `uri`     | string | -       | Post AT Protocol URI (for `/api/analysis/by-uri`) |
 
+## Log Analysis with `jq`
+
+The server writes structured JSON logs to `logs/server-{YYYY-MM-DD}.log`.  
+You can use `jq` to query and analyze these logs:
+
+### Read All Logs (Pretty Print)
+
+```bash
+jq . logs/server-2026-03-27.log
+```
+
+### Filter by Log Level
+
+```bash
+# Only errors
+jq 'select(.level == "ERROR")' logs/server-2026-03-27.log
+
+# Only warnings and errors
+jq 'select(.level == "WARN" or .level == "ERROR")' logs/server-2026-03-27.log
+```
+
+### Filter by Request ID
+
+Trace all operations for a specific request:
+
+```bash
+jq 'select(.request_id == "a1b2c3d4")' logs/server-2026-03-27.log
+```
+
+### View AI Analysis Metrics
+
+```bash
+# Show all AI analysis completions with costs and tokens
+jq 'select(.msg == "ai analysis completed")' logs/server-2026-03-27.log
+
+# Extract only cost and tokens
+jq 'select(.msg == "ai analysis completed") | {time: .time, model: .model, tokens: .tokens_used, cost: .cost_usd}' logs/server-2026-03-27.log
+```
+
+### Calculate Total Costs
+
+```bash
+# Sum all AI costs for the day
+jq 'select(.msg == "ai analysis completed") | .cost_usd' logs/server-2026-03-27.log | awk '{sum+=$1} END {print "Total: $"sum}'
+```
+
+### View Request Durations
+
+```bash
+# Show all completed requests with duration
+jq 'select(.msg == "request completed") | {time: .time, path: .path, status: .status, duration_ms: .duration_ms}' logs/server-2026-03-27.log
+
+# Find slowest requests (> 5 seconds)
+jq 'select(.msg == "request completed" and .duration_ms > 5000)' logs/server-2026-03-27.log
+```
+
+### Track Bluesky API Performance
+
+```bash
+# Show all Bluesky search operations
+jq 'select(.msg | contains("bluesky"))' logs/server-2026-03-27.log
+
+# Average response time for Bluesky searches
+jq 'select(.msg == "bluesky search completed") | .duration_ms' logs/server-2026-03-27.log | awk '{sum+=$1; count++} END {print "Avg: "sum/count" ms"}'
+```
+
+### View Errors with Context
+
+```bash
+# Show error messages with context
+jq -C 'select(.level == "ERROR")' logs/server-2026-03-27.log | less -R
+```
+
+### Live Tail (Real-time Monitoring)
+
+```bash
+# Monitor logs in real-time
+tail -f logs/server-$(date +%Y-%m-%d).log | jq .
+```
+
+### Aggregate Statistics
+
+```bash
+# Count requests by status code
+jq -r 'select(.msg == "request completed") | .status' logs/server-2026-03-27.log | sort | uniq -c
+
+# Count AI analyses per model
+jq -r 'select(.msg == "ai analysis completed") | .model' logs/server-2026-03-27.log | sort | uniq -c
+```
+
 ## Scoring System
 
 Each value is scored 0-6:

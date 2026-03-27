@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 	"sync"
@@ -21,6 +22,10 @@ func Init() error {
 	var err error
 	once.Do(func() {
 		cfg, err = loadConfig()
+		if err != nil {
+			return
+		}
+		initCachedReader()
 	})
 	return err
 }
@@ -68,25 +73,29 @@ func stripMarkdownCodeFences(data []byte) []byte {
 
 func (f *FeedItem) generatePrompt() (string, error) {
 	config := GetConfig()
-	promptData, err := os.ReadFile(config.Ai["prompt"])
+
+	promptData, err := GetCachedReader()(config.Ai["prompt"])
 	if err != nil {
-		return "", fmt.Errorf("error reading PROMPT.MD")
+		return "", fmt.Errorf("error reading PROMPT.MD: %w", err)
 	}
 
-	schwartzData, err := os.ReadFile(config.Ai["schwartz"])
+	schwartzData, err := GetCachedReader()(config.Ai["schwartz"])
 	if err != nil {
-		return "", fmt.Errorf("error reading SCHWARTZ.MD")
+		return "", fmt.Errorf("error reading SCHWARTZ.MD: %w", err)
 	}
 
 	return fmt.Sprintf("%s\n---BEGIN POST---\n%s\n---END POST---\n%s", schwartzData, f.Text, promptData), nil
 }
 
-// Using Schwartz Values it ask to the selected mododel how are they reflected inside the post
 func (f *FeedItem) ValueAlignment(model string) error {
+	log := slog.With("post_uri", f.URI, "model", model)
+	log.Info("ai analysis started")
+
 	start := time.Now()
 
 	prompt, err := f.generatePrompt()
 	if err != nil {
+		log.Error("failed to generate prompt", "error", err)
 		return err
 	}
 
@@ -106,6 +115,7 @@ func (f *FeedItem) ValueAlignment(model string) error {
 		},
 	)
 	if err != nil {
+		log.Error("openrouter client error", "error", err)
 		return fmt.Errorf("openrouter client error: %v", err)
 	}
 
@@ -117,17 +127,26 @@ func (f *FeedItem) ValueAlignment(model string) error {
 
 	err = json.Unmarshal(data, &f.Values)
 	if err != nil {
+		log.Error("failed to unmarshal ai response", "error", err, "response", string(data))
 		return fmt.Errorf("unmarshal error: %v, data: %s", err, string(data))
 	}
 
 	f.ValuesArr = f.Values.ToArray()
 	f.calculateScore()
+	f.Model = model
 
 	f.Stats = RequestStats{
 		ResponseTimeMs: elapsed.Milliseconds(),
 		TokensUsed:     aiResp.Usage.TotalTokens,
 		CostUsd:        aiResp.Usage.Cost,
 	}
+
+	log.Info("ai analysis completed",
+		"response_time_ms", elapsed.Milliseconds(),
+		"tokens_used", aiResp.Usage.TotalTokens,
+		"cost_usd", aiResp.Usage.Cost,
+		"score", f.Score,
+	)
 
 	return nil
 }
