@@ -48,9 +48,9 @@ def compute_averages(posts: list) -> dict:
 
 def main():
     gpt_data = load_json("post_data_gpt.json")
-    qwen_data = load_json("post_data_qwen.json")
+    gemini_data = load_json("post_data_gemini.json")
 
-    if gpt_data is None or qwen_data is None:
+    if gpt_data is None or gemini_data is None:
         print("Error loading data")
         return
 
@@ -58,7 +58,7 @@ def main():
 
     res = {
         gpt_data[0]["model"]: compute_averages(gpt_data),
-        qwen_data[0]["model"]: compute_averages(qwen_data),
+        gemini_data[0]["model"]: compute_averages(gemini_data),
     }
 
     print("Averages:")

@@ -3,6 +3,9 @@ package bluesky
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
@@ -206,4 +209,75 @@ func (c Client) GetPost(postUri string) *scorer.FeedItem {
 	)
 
 	return item
+}
+
+// ParseBlueskyURL extracts handle and post ID from a Bluesky URL
+// Expected format: https://bsky.app/profile/[handle]/post/[postid]
+func ParseBlueskyURL(blueskyURL string) (handle, postID string, err error) {
+	parsed, err := url.Parse(blueskyURL)
+	if err != nil {
+		return "", "", fmt.Errorf("invalid URL: %w", err)
+	}
+
+	if parsed.Host != "bsky.app" {
+		return "", "", fmt.Errorf("invalid host: expected bsky.app, got %s", parsed.Host)
+	}
+
+	pathParts := strings.Split(strings.Trim(parsed.Path, "/"), "/")
+	if len(pathParts) < 4 || pathParts[0] != "profile" || pathParts[2] != "post" {
+		return "", "", fmt.Errorf("invalid URL format: expected /profile/[handle]/post/[postid]")
+	}
+
+	handle = pathParts[1]
+	postID = pathParts[3]
+
+	handleRegex := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9.-]{1,}[a-zA-Z0-9]$`)
+	if !handleRegex.MatchString(handle) {
+		return "", "", fmt.Errorf("invalid handle format: %s", handle)
+	}
+
+	postIDRegex := regexp.MustCompile(`^[a-zA-Z0-9]+$`)
+	if !postIDRegex.MatchString(postID) {
+		return "", "", fmt.Errorf("invalid post ID format: %s", postID)
+	}
+
+	return handle, postID, nil
+}
+
+// ResolveHandleToDID resolves a Bluesky handle to a DID
+func (c Client) ResolveHandleToDID(handle string) (string, error) {
+	logger.Debug("resolving handle to DID", "handle", handle)
+
+	session, err := atproto.IdentityResolveHandle(context.Background(), c.client, handle)
+	if err != nil {
+		logger.Error("failed to resolve handle", "handle", handle, "error", err)
+		return "", fmt.Errorf("failed to resolve handle %s: %w", handle, err)
+	}
+
+	return session.Did, nil
+}
+
+// GetPostFromBlueskyURL parses a Bluesky URL, resolves the handle, and fetches the post
+func (c Client) GetPostFromBlueskyURL(blueskyURL string) (*scorer.FeedItem, error) {
+	handle, postID, err := ParseBlueskyURL(blueskyURL)
+	if err != nil {
+		return nil, err
+	}
+
+	did, err := c.ResolveHandleToDID(handle)
+	if err != nil {
+		return nil, err
+	}
+
+	postURI := fmt.Sprintf("at://%s/app.bsky.feed.post/%s", did, postID)
+
+	logger.Info("resolved bluesky URL to AT URI",
+		"bluesky_url", blueskyURL,
+		"handle", handle,
+		"did", did,
+		"post_id", postID,
+		"at_uri", postURI,
+	)
+
+	return c.GetPost(postURI), nil
 }

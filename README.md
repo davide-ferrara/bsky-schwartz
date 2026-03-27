@@ -177,31 +177,100 @@ curl "http://localhost:8080/api/analysis/by-uri?uri=at://did:plc:d5v2lwniz6g57us
 
 ### Endpoints
 
-| Method | Endpoint               | Description                            |
-| ------ | ---------------------- | -------------------------------------- |
-| `GET`  | `/health`              | Health check                           |
-| `GET`  | `/api/analysis`        | Search posts and analyze with Schwartz |
-| `GET`  | `/api/search`          | Search and return only post URIs       |
-| `GET`  | `/api/analysis/by-uri` | Get a single post by URI and analyze   |
+| Method | Endpoint               | Description                                       |
+| ------- | ---------------------- | ------------------------------------------------- |
+| `GET`   | `/health`              | Health check                                      |
+| `GET`   | `/api/analysis`        | Search posts and analyze with Schwartz values      |
+| `GET`   | `/api/search`          | Search and return only post URIs                  |
+| `POST`  | `/api/analysis/by-url` | Analyze posts from Bluesky URLs (batch supported) |
 
 ### Query Parameters
 
-| Parameter | Type   | Default | Description                                       |
-| --------- | ------ | ------- | ------------------------------------------------- |
-| `query`   | string | -       | Search query                                      |
-| `limit`   | int    | `10`    | Number of posts                                   |
-| `model`   | string | `gpt`   | AI model to use                                   |
-| `uri`     | string | -       | Post AT Protocol URI (for `/api/analysis/by-uri`) |
+#### `/api/analysis`
+| Parameter | Type   | Default | Description              |
+| --------- | ------ | ------- | ------------------------ |
+| `query`   | string | -       | Search query (required)  |
+| `limit`   | int    | `10`    | Number of posts          |
+| `model`   | string | `gpt`   | AI model to use          |
 
-## Log Analysis with `jq`
+#### `/api/search`
+| Parameter | Type   | Default | Description              |
+| --------- | ------ | ------- | ------------------------ |
+| `query`   | string | -       | Search query (required)  |
+| `limit`   | int    | `10`    | Number of posts          |
 
-The server writes structured JSON logs to `logs/server-{YYYY-MM-DD}.log`.  
-You can use `jq` to query and analyze these logs:
+#### `/api/analysis/by-url` (POST)
+**Request Body:**
+```json
+{
+  "urls": [
+    "https://bsky.app/profile/user.bsky.social/post/abc123",
+    "https://bsky.app/profile/another.bsky.social/post/def456"
+  ],
+  "model": "gpt4o"
+}
+```
 
-### Read All Logs (Pretty Print)
+**Response:** Array of analyzed posts with Schwartz values and scores.
 
+**Features:**
+- Accepts Bluesky URLs directly (no need to extract URIs manually)
+- Batch processing: analyze multiple posts in one request
+- Parallel processing with worker pool for fast performance
+- Automatic handle resolution to DID
+- Fail-fast: stops on first error
+
+## API Usage Examples
+
+### Health Check
 ```bash
-jq . logs/server-2026-03-27.log
+curl http://localhost:8080/health
+```
+
+### Search and Analyze Posts
+```bash
+# Search posts and analyze with Schwartz values
+curl "http://localhost:8080/api/analysis?query=cats&limit=2&model=gpt4o"
+
+# Search with specific model
+curl "http://localhost:8080/api/analysis?query=trump&limit=5&model=gemini3"
+
+# Get formatted JSON output with jq
+curl "http://localhost:8080/api/analysis?query=ai&limit=3&model=qwen3" | jq '.'
+```
+
+### Analyze Posts from Bluesky URLs
+```bash
+# Single post by URL
+curl -X POST "http://localhost:8080/api/analysis/by-url" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "urls": ["https://bsky.app/profile/user.bsky.social/post/abc123"],
+    "model": "gpt4o"
+  }' | jq '.'
+
+# Batch analyze multiple posts
+curl -X POST "http://localhost:8080/api/analysis/by-url" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "urls": [
+      "https://bsky.app/profile/user1.bsky.social/post/abc123",
+      "https://bsky.app/profile/user2.bsky.social/post/def456",
+      "https://bsky.app/profile/user3.bsky.social/post/ghi789"
+    ],
+    "model": "gpt4o"
+  }' | jq '.[].score'
+
+# Analyze with different model
+curl -X POST "http://localhost:8080/api/analysis/by-url" \
+  -H "Content-Type: application/json" \
+  -d '{"urls": ["https://bsky.app/profile/example.bsky.social/post/xyz"], "model": "qwen3"}'
+```
+
+### Search Posts (URIs Only)
+```bash
+# Get post URIs without analysis
+curl "http://localhost:8080/api/search?query=programming&limit=10"
 ```
 
 ### Filter by Log Level

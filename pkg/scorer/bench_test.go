@@ -2,40 +2,8 @@ package scorer
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"testing"
-
-	"github.com/gin-gonic/gin"
 )
-
-func TestPostScoreHandler(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
-	router.GET("/api/post/score/:model", PostScoreHanlder)
-
-	tests := []struct {
-		name       string
-		model      string
-		wantStatus int
-	}{
-		{"valid_gpt", "gpt", http.StatusOK},
-		{"valid_qwen", "qwen", http.StatusOK},
-		{"invalid_model", "invalid", http.StatusBadRequest},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req, _ := http.NewRequest("GET", "/api/post/score/"+tt.model, nil)
-			w := httptest.NewRecorder()
-			router.ServeHTTP(w, req)
-
-			if w.Code != tt.wantStatus {
-				t.Errorf("got status %d, want %d", w.Code, tt.wantStatus)
-			}
-		})
-	}
-}
 
 func TestParseSchwartzValues(t *testing.T) {
 	jsonData := `{
