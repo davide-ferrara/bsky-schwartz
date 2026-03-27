@@ -103,7 +103,35 @@ negative, allowing the score to reflect alignment or opposition to certain value
 
 ---
 
-## 8. Build & Run Commands
+## 8. API Usage Examples
+
+```bash
+# Health check
+curl http://localhost:8080/health
+
+# Search posts and analyze with default model (gpt)
+curl "http://localhost:8080/api/analysis?query=cats&limit=2"
+
+# Search with specific model (URL must be quoted due to &)
+curl "http://localhost:8080/api/analysis?query=trump&model=gemini3"
+
+# Get formatted JSON output with jq
+curl "http://localhost:8080/api/analysis?query=trump&model=gemini3" | jq .
+
+# Save formatted JSON to file
+curl "http://localhost:8080/api/analysis?query=trump&model=gemini3" | jq . > data.json
+```
+
+Available models are defined in `config.json`:
+- `gpt` - openai/gpt-4o-mini
+- `qwen` - qwen/qwen-2.5-72b-instruct
+- `qwen3` - qwen/qwen3.5-35b-a3b
+- `minimax` - minimax/minimax-m2.5
+- `gemini3` - google/gemini-3.1-flash-lite-preview
+
+---
+
+## 9. Build & Run Commands
 
 - **Build:** `make build`
 - **Run:** `make run`

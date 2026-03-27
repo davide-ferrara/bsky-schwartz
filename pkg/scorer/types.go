@@ -42,6 +42,7 @@ type FeedItem struct {
 	Values        SchwartzValues `json:"values"`
 	ValuesArr     []int          `json:"values_arr"`
 	Score         float64        `json:"score"`
+	Model         string         `json:"model"`
 	Stats         RequestStats   `json:"stats,omitempty"`
 }
 
@@ -54,7 +55,12 @@ type RequestStats struct {
 type Config struct {
 	Weights Weights           `json:"weights"`
 	Models  Models            `json:"models"`
-	Ai      map[string]string `jsoon:"ai"`
+	Ai      map[string]string `json:"ai"`
+	Workers WorkerConfig      `json:"workers"`
+}
+
+type WorkerConfig struct {
+	MaxConcurrent int `json:"max_concurrent"`
 }
 
 type SchwartzValues struct {
