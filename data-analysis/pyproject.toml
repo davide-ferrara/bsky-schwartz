@@ -7,4 +7,6 @@ requires-python = ">=3.14"
 dependencies = [
     "matplotlib",
     "numpy",
+    "requests",
+    "scipy",
 ]

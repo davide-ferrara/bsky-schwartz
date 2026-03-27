@@ -31,7 +31,9 @@
   },
   "ai": {
     "prompt": "data/PROMPT.md",
-    "schwartz": "data/SCHWARTZ.md"
+    "prompt_version": "v2",
+    "schwartz": "data/SCHWARTZ.md",
+    "schwartz_version": "lite"
   },
   "workers": {
     "max_concurrent": 5

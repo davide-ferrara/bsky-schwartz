@@ -50,6 +50,22 @@ func loadConfig() (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
+	// Handle prompt_version switch
+	if config.Ai.PromptVersion == "v2" {
+		config.Ai.Prompt = "data/PROMPT_V2.md"
+	} else if config.Ai.PromptVersion == "v1" {
+		config.Ai.Prompt = "data/PROMPT.md"
+	}
+	// If prompt_version is empty or not set, use the value from config
+
+	// Handle schwartz_version switch
+	if config.Ai.SchwartzVersion == "lite" {
+		config.Ai.Schwartz = "data/SCHWARTZ_LITE.md"
+	} else if config.Ai.SchwartzVersion == "full" {
+		config.Ai.Schwartz = "data/SCHWARTZ.md"
+	}
+	// If schwartz_version is empty or not set, use the value from config
+
 	return &config, nil
 }
 
@@ -74,17 +90,12 @@ func stripMarkdownCodeFences(data []byte) []byte {
 func (f *FeedItem) generatePrompt() (string, error) {
 	config := GetConfig()
 
-	promptData, err := GetCachedReader()(config.Ai["prompt"])
-	if err != nil {
-		return "", fmt.Errorf("error reading PROMPT.MD: %w", err)
-	}
-
-	schwartzData, err := GetCachedReader()(config.Ai["schwartz"])
+	basePrompt, err := GetCachedReader()(config.Ai.Schwartz)
 	if err != nil {
 		return "", fmt.Errorf("error reading SCHWARTZ.MD: %w", err)
 	}
 
-	return fmt.Sprintf("%s\n---BEGIN POST---\n%s\n---END POST---\n%s", schwartzData, f.Text, promptData), nil
+	return fmt.Sprintf("%s\n%s", basePrompt, f.Text), nil
 }
 
 func (f *FeedItem) ValueAlignment(model string) error {

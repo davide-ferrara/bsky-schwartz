@@ -54,10 +54,15 @@ type RequestStats struct {
 }
 
 type Config struct {
-	Weights Weights           `json:"weights"`
-	Models  Models            `json:"models"`
-	Ai      map[string]string `json:"ai"`
-	Workers WorkerConfig      `json:"workers"`
+	Weights Weights `json:"weights"`
+	Models  Models  `json:"models"`
+	Ai      struct {
+		Prompt          string `json:"prompt"`
+		PromptVersion   string `json:"prompt_version,omitempty"`
+		Schwartz        string `json:"schwartz"`
+		SchwartzVersion string `json:"schwartz_version,omitempty"`
+	} `json:"ai"`
+	Workers WorkerConfig `json:"workers"`
 }
 
 type WorkerConfig struct {
