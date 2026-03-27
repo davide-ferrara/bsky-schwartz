@@ -22,19 +22,19 @@ mkdir -p "$OUTPUT_DIR"
 fetch_urls() {
     local query="$1"
     
-    echo "  Fetching: $query"
+    echo "  Fetching: $query" >&2
     
     # Fetch URLs from API
     urls=$(curl -s "${API_URL}?query=${query}&limit=${LIMIT}" | jq -r '.[]' 2>/dev/null)
     
     if [ -z "$urls" ]; then
-        echo "    ⚠️  No results"
+        echo "    ⚠️  No results" >&2
         return
     fi
     
     # Count URLs
     url_count=$(echo "$urls" | wc -l)
-    echo "    ✓ Found $url_count URLs"
+    echo "    ✓ Found $url_count URLs" >&2
     
     # Return URLs
     echo "$urls"
@@ -46,10 +46,10 @@ create_feed() {
     shift
     local queries=("$@")
     
-    echo ""
-    echo "=========================================="
-    echo "Downloading: $group_name"
-    echo "=========================================="
+    echo "" >&2
+    echo "==========================================" >&2
+    echo "Downloading: $group_name" >&2
+    echo "==========================================" >&2
     
     all_urls=""
     
@@ -61,7 +61,7 @@ create_feed() {
     done
     
     if [ -z "$all_urls" ]; then
-        echo "  ⚠️  No URLs found for $group_name"
+        echo "  ⚠️  No URLs found for $group_name" >&2
         return
     fi
     
@@ -77,9 +77,9 @@ create_feed() {
         model: "'"$MODEL"'"
     }' > "$OUTPUT_DIR/${group_name}.json"
     
-    echo ""
-    echo "  ✓ Total unique URLs: $total"
-    echo "  ✓ Saved to: $OUTPUT_DIR/${group_name}.json"
+    echo "" >&2
+    echo "  ✓ Total unique URLs: $total" >&2
+    echo "  ✓ Saved to: $OUTPUT_DIR/${group_name}.json" >&2
 }
 
 # ==========================================
@@ -147,16 +147,16 @@ create_feed "topic_economy" \
     "lavoro" \
     "disoccupazione"
 
-echo ""
-echo "=========================================="
-echo "Download complete!"
-echo "=========================================="
-echo ""
-echo "Feeds saved in: $OUTPUT_DIR"
-echo ""
-ls -lh "$OUTPUT_DIR"/*.json
-echo ""
-echo "To analyze a feed:"
-echo "  curl -X POST http://localhost:8080/api/analysis/by-url \\"
-echo "    -H 'Content-Type: application/json' \\"
-echo "    -d @feeds/conservation.json | jq '.'"
+echo "" >&2
+echo "==========================================" >&2
+echo "Download complete!" >&2
+echo "==========================================" >&2
+echo "" >&2
+echo "Feeds saved in: $OUTPUT_DIR" >&2
+echo "" >&2
+ls -lh "$OUTPUT_DIR"/*.json >&2
+echo "" >&2
+echo "To analyze a feed:" >&2
+echo "  curl -X POST http://localhost:8080/api/analysis/by-url \\" >&2
+echo "    -H 'Content-Type: application/json' \\" >&2
+echo "    -d @feeds/conservation.json | jq '.'" >&2
