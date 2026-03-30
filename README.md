@@ -1,374 +1,94 @@
 # Bluesky Schwartz
 
-[![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat-square&logo=go&logoColor=white)](https://golang.org/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Paper](https://img.shields.io/badge/Paper-arXiv:2509.14434-B31B1B?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/pdf/2509.14434)
-
-**AI-Powered Social Media Content Analysis based on Schwartz Theory of Basic
-Human Values**
-
-bsky-schwartz is a Go application that analyzes Bluesky posts using the
-[Schwartz Theory of Basic Human Values](https://en.wikipedia.org/wiki/Schwartz_theory_of_basic_human_values).
-It leverages AI to evaluate content against 19 universal value dimensions and
-calculates alignment scores.
-
-## Background
-
-This project is inspired by the paper
-["Using Large Language Models to Assess Human Values in Social Media"](https://arxiv.org/abs/2509.14434)
-which explores how LLMs can be used to analyze and quantify human values
-expressed in social media content.
+AI-powered social media content analysis based on Schwartz Theory of Basic Human Values.
 
 ## Overview
 
-The project fetches posts from Bluesky Social and uses AI (via OpenRouter) to
-analyze how each post reflects the 19 basic human values defined by Shalom
-Schwartz. Each post receives a score that indicates its alignment with different
-value orientations.
+Analizza post di Bluesky utilizzando i 19 valori fondamentali di Schwartz attraverso AI (OpenRouter).
 
-## Features
-
-- **Schwartz Value Analysis**: Evaluates posts against 19 universal human values
-- **AI-Powered Scoring**: Uses OpenRouter-compatible AI models for analysis
-- **Configurable Weights**: Supports different political/value orientations
-  (left, right, etc.)
-- **Bluesky Integration**: Direct integration with Bluesky Social API
-- **REST API Ready**: Structured for easy HTTP API deployment
-- **Thread-Safe Configuration**: Singleton config with sync.Once for safe
-  concurrent access
-
-## Architecture
+## Flusso
 
 ```
-pkg/
-├── scorer/          # Core scoring logic and AI integration
-│   ├── scorer.go    # Score calculation and AI prompting
-│   ├── types.go     # Data structures (FeedItem, SchwartzValues, Config)
-│   └── handler.go   # HTTP handlers (if applicable)
-└── bluesky/         # Bluesky Social API client
-    └── client.go    # Query posts, threads, and social features
-
-cmd/
-└── server/          # Main application entrypoint
-    └── main.go
-
-data/
-├── SCHWARTZ.md       # Schwartz value definitions and scoring instructions
-└── PROMPT.md        # AI prompt template
+Post URL → Fetch Bluesky → Build Prompt → AI Analysis → JSON Output
 ```
 
-## The 19 Schwartz Values
+1. Fetch post da Bluesky (testo, link, metadata)
+2. Costruisce prompt con dati post  
+3. Chiama OpenRouter AI per analisi
+4. Salva risultati in JSON
 
-| Value ID        | Cluster            | Description                               |
-| --------------- | ------------------ | ----------------------------------------- |
-| `sd_thought`    | Openness to Change | Freedom to cultivate one's own ideas      |
-| `sd_action`     | Openness to Change | Freedom to determine one's own actions    |
-| `stimulation`   | Openness to Change | Excitement and stimulation                |
-| `hedonism`      | Openness to Change | Pleasure and sensuous gratification       |
-| `achievement`   | Self-Enhancement   | Success according to social standards     |
-| `dominance`     | Self-Enhancement   | Influence and power over others           |
-| `resources`     | Self-Enhancement   | Control of material and social resources  |
-| `face`          | Self-Enhancement   | Maintaining public image                  |
-| `personal_sec`  | Conservation       | Personal safety and security              |
-| `societal_sec`  | Conservation       | Safety and stability in society           |
-| `tradition`     | Conservation       | Preserving cultural and religious customs |
-| `rule_conf`     | Conservation       | Compliance with rules and laws            |
-| `inter_conf`    | Conservation       | Respect for others and social norms       |
-| `humility`      | Conservation       | Recognizing one's insignificance          |
-| `caring`        | Self-Transcendence | Devotion to welfare of others             |
-| `dependability` | Self-Transcendence | Reliability and loyalty                   |
-| `universalism`  | Self-Transcendence | Justice and equality for all              |
-| `nature`        | Self-Transcendence | Preservation of nature                    |
-| `tolerance`     | Self-Transcendence | Acceptance of those different             |
+## Struttura
+
+```
+feed-generator/
+├── main.go           # Entry point
+├── client.go         # Bluesky client + estrazione dati
+├── valueAnalysis.go  # AI analysis (OpenRouter)
+├── prompts/
+│   └── PROMPT_V3.md  # Prompt Schwartz values
+└── feed/             # Feed URLs
+```
 
 ## Setup
 
 ### Prerequisites
 
 - Go 1.21+
-- Bluesky account with app password
+- Bluesky account con app password
 - OpenRouter API key
 
 ### Environment Variables
 
-Create a `.env` file in the project root:
+Creare `.env` in `feed-generator/`:
 
 ```bash
-# Bluesky credentials
-BSKY_HANDLE=your-handle.bsky.social
-BSKY_APP_PASSWORD=your-app-password
-
-# OpenRouter API key
-OPEN_ROUTER_KEY=sk-or-v1-...
-
-# Database (optional)
-DB_HOST=localhost
-DB_PORT=5433
-DB_USER=admin
-DB_PASSWORD=admin
-DB_NAME=bsky
-
-# Application
-PORT=8080
-CONFIG_PATH=config.json
-```
-
-### Configuration
-
-Edit `config.json` to customize:
-
-```json
-{
-  "models": {
-    "gpt": "openai/gpt-4o-mini",
-    "qwen": "qwen/qwen-2.5-72b-instruct"
-  },
-  "weights": {
-    "left": {
-      "Stimulation": -1,
-      "Hedonism": -5,
-      ...
-    }
-  },
-  "ai": {
-    "prompt": "data/PROMPT.md",
-    "schwartz": "data/SCHWARTZ.md"
-  }
-}
+BSKY_HANDLE=tuo_handle.bsky.social
+BSKY_APP_PASSWORD=tua_app_password
+OPEN_ROUTER_KEY=tua_openrouter_key
 ```
 
 ## Usage
 
-### Run the Server
-
 ```bash
-make run
+cd feed-generator
+make build  # compila
+make run    # esegue
 ```
 
-### Build
+## Output
 
-```bash
-make build
-```
+`Posts_TIMESTAMP.json` con:
 
-### Run Tests
-
-```bash
-make test
-```
-
-## API Reference
-
-### Examples
-
-```bash
-# Health check
-curl http://localhost:8080/health
-
-# Search posts and analyze with Schwartz values
-curl "http://localhost:8080/api/analysis?query=cats&limit=2&model=qwen"
-
-# Search and return only post URIs
-curl "http://localhost:8080/api/search?query=cats&limit=10"
-
-# Get a single post by URI and analyze
-curl "http://localhost:8080/api/analysis/by-uri?uri=at://did:plc:d5v2lwniz6g57usqe2fzxzgt/app.bsky.feed.post/3mhvowobwbc2g&model=qwen"
-```
-
-### Endpoints
-
-| Method | Endpoint               | Description                                       |
-| ------- | ---------------------- | ------------------------------------------------- |
-| `GET`   | `/health`              | Health check                                      |
-| `GET`   | `/api/analysis`        | Search posts and analyze with Schwartz values      |
-| `GET`   | `/api/search`          | Search and return only post URIs                  |
-| `POST`  | `/api/analysis/by-url` | Analyze posts from Bluesky URLs (batch supported) |
-
-### Query Parameters
-
-#### `/api/analysis`
-| Parameter | Type   | Default | Description              |
-| --------- | ------ | ------- | ------------------------ |
-| `query`   | string | -       | Search query (required)  |
-| `limit`   | int    | `10`    | Number of posts          |
-| `model`   | string | `gpt`   | AI model to use          |
-
-#### `/api/search`
-| Parameter | Type   | Default | Description              |
-| --------- | ------ | ------- | ------------------------ |
-| `query`   | string | -       | Search query (required)  |
-| `limit`   | int    | `10`    | Number of posts          |
-
-#### `/api/analysis/by-url` (POST)
-**Request Body:**
 ```json
 {
-  "urls": [
-    "https://bsky.app/profile/user.bsky.social/post/abc123",
-    "https://bsky.app/profile/another.bsky.social/post/def456"
-  ],
-  "model": "gpt4o"
+  "AtURI": "at://did:plc:.../app.bsky.feed.post/...",
+  "Text": "...",
+  "AuthorName": "...",
+  "Links": [...],
+  "ValueAnalysis": {
+    "Rating": {
+      "Reputation": 0,
+      "Power": 2,
+      ...
+    },
+    "Reasoning": "...",
+    "Stats": {
+      "model": "openai/gpt-4o-mini",
+      "response_time_ms": 2340,
+      "cost_usd": 0.0012
+    }
+  }
 }
 ```
 
-**Response:** Array of analyzed posts with Schwartz values and scores.
+## Schwartz Values (19)
 
-**Features:**
-- Accepts Bluesky URLs directly (no need to extract URIs manually)
-- Batch processing: analyze multiple posts in one request
-- Parallel processing with worker pool for fast performance
-- Automatic handle resolution to DID
-- Fail-fast: stops on first error
-
-## API Usage Examples
-
-### Health Check
-```bash
-curl http://localhost:8080/health
-```
-
-### Search and Analyze Posts
-```bash
-# Search posts and analyze with Schwartz values
-curl "http://localhost:8080/api/analysis?query=cats&limit=2&model=gpt4o"
-
-# Search with specific model
-curl "http://localhost:8080/api/analysis?query=trump&limit=5&model=gemini3"
-
-# Get formatted JSON output with jq
-curl "http://localhost:8080/api/analysis?query=ai&limit=3&model=qwen3" | jq '.'
-```
-
-### Analyze Posts from Bluesky URLs
-```bash
-# Single post by URL
-curl -X POST "http://localhost:8080/api/analysis/by-url" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "urls": ["https://bsky.app/profile/user.bsky.social/post/abc123"],
-    "model": "gpt4o"
-  }' | jq '.'
-
-# Batch analyze multiple posts
-curl -X POST "http://localhost:8080/api/analysis/by-url" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "urls": [
-      "https://bsky.app/profile/user1.bsky.social/post/abc123",
-      "https://bsky.app/profile/user2.bsky.social/post/def456",
-      "https://bsky.app/profile/user3.bsky.social/post/ghi789"
-    ],
-    "model": "gpt4o"
-  }' | jq '.[].score'
-
-# Analyze with different model
-curl -X POST "http://localhost:8080/api/analysis/by-url" \
-  -H "Content-Type: application/json" \
-  -d '{"urls": ["https://bsky.app/profile/example.bsky.social/post/xyz"], "model": "qwen3"}'
-```
-
-### Search Posts (URIs Only)
-```bash
-# Get post URIs without analysis
-curl "http://localhost:8080/api/search?query=programming&limit=10"
-```
-
-### Filter by Log Level
-
-```bash
-# Only errors
-jq 'select(.level == "ERROR")' logs/server-2026-03-27.log
-
-# Only warnings and errors
-jq 'select(.level == "WARN" or .level == "ERROR")' logs/server-2026-03-27.log
-```
-
-### Filter by Request ID
-
-Trace all operations for a specific request:
-
-```bash
-jq 'select(.request_id == "a1b2c3d4")' logs/server-2026-03-27.log
-```
-
-### View AI Analysis Metrics
-
-```bash
-# Show all AI analysis completions with costs and tokens
-jq 'select(.msg == "ai analysis completed")' logs/server-2026-03-27.log
-
-# Extract only cost and tokens
-jq 'select(.msg == "ai analysis completed") | {time: .time, model: .model, tokens: .tokens_used, cost: .cost_usd}' logs/server-2026-03-27.log
-```
-
-### Calculate Total Costs
-
-```bash
-# Sum all AI costs for the day
-jq 'select(.msg == "ai analysis completed") | .cost_usd' logs/server-2026-03-27.log | awk '{sum+=$1} END {print "Total: $"sum}'
-```
-
-### View Request Durations
-
-```bash
-# Show all completed requests with duration
-jq 'select(.msg == "request completed") | {time: .time, path: .path, status: .status, duration_ms: .duration_ms}' logs/server-2026-03-27.log
-
-# Find slowest requests (> 5 seconds)
-jq 'select(.msg == "request completed" and .duration_ms > 5000)' logs/server-2026-03-27.log
-```
-
-### Track Bluesky API Performance
-
-```bash
-# Show all Bluesky search operations
-jq 'select(.msg | contains("bluesky"))' logs/server-2026-03-27.log
-
-# Average response time for Bluesky searches
-jq 'select(.msg == "bluesky search completed") | .duration_ms' logs/server-2026-03-27.log | awk '{sum+=$1; count++} END {print "Avg: "sum/count" ms"}'
-```
-
-### View Errors with Context
-
-```bash
-# Show error messages with context
-jq -C 'select(.level == "ERROR")' logs/server-2026-03-27.log | less -R
-```
-
-### Live Tail (Real-time Monitoring)
-
-```bash
-# Monitor logs in real-time
-tail -f logs/server-$(date +%Y-%m-%d).log | jq .
-```
-
-### Aggregate Statistics
-
-```bash
-# Count requests by status code
-jq -r 'select(.msg == "request completed") | .status' logs/server-2026-03-27.log | sort | uniq -c
-
-# Count AI analyses per model
-jq -r 'select(.msg == "ai analysis completed") | .model' logs/server-2026-03-27.log | sort | uniq -c
-```
-
-## Scoring System
-
-Each value is scored 0-6:
-
-- **0**: Value not present or contradicted
-- **1-2**: Value slightly reflected
-- **3-4**: Value moderately reflected
-- **5-6**: Value strongly reflected
-
-The final score is calculated as a weighted sum:
-
-```
-score = Σ(value_i × weight_i)
-```
-
-Negative weights apply a penalty multiplier (2.0x) to allow for differentiation
-between opposing values.
+| Cluster | Values |
+|---------|--------|
+| Openness to Change | Independent thoughts, Independent actions, Stimulation, Pleasure |
+| Self-Enhancement | Achievement, Power, Wealth, Reputation |
+| Conservation | Personal security, Societal security, Tradition, Lawfulness, Respect, Humility |
+| Self-Transcendence | Caring, Responsibility, Equality, Nature, Tolerance |
 
 ## License
 
