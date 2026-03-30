@@ -14,8 +14,6 @@ import (
 	"github.com/revrost/go-openrouter"
 )
 
-var logLevel = flag.String("log", "info", "log level (debug, info, warn, error)")
-
 func main() {
 	flag.Parse()
 
@@ -28,8 +26,26 @@ func main() {
 		panic("failed to init AI Client: " + err.Error())
 	}
 
-	models := []string{"openai/gpt-4.1-mini", "google/gemini-3.1-flash-lite-preview"}
+	models := []string{"openai/gpt-4.1-mini", "google/gemini-3.1-flash-lite-preview", "mistralai/mistral-small-2603", "qwen/qwen3.5-9b"}
 
+	// posts := DownloadFeed("./feed/conservation.json")
+
+	posts, err := LoadStaticPosts("./feed_20260330212226.json")
+	if err != nil {
+		fmt.Println("Could not open JSON")
+		panic(err)
+	}
+
+	fmt.Println("Starting analysis...")
+
+	limit := 10
+
+	if err := runAnalysisSync(openrouterClient, posts[:limit], models[3]); err != nil {
+		fmt.Println("Error running analysis with", models[3], ":", err)
+	}
+}
+
+func DownloadFeed(path string) []Post {
 	ctx := context.Background()
 	handle := GetEnv("BSKY_HANDLE")
 	appPassword := GetEnv("BSKY_APP_PASSWORD")
@@ -38,32 +54,6 @@ func main() {
 		panic(err)
 	}
 
-	posts := DownloadFeed(bskyClient, ctx, "./feed/conservation.json")
-
-	// posts, err := LoadStaticPosts("./posts_20260330210102.json")
-	// if err != nil {
-	// 	fmt.Println("Could not open JSON")
-	// 	panic(err)
-	// }
-
-	if err := SavePostsToJson("posts", posts); err != nil {
-		fmt.Println("Could not save results to JSON")
-		os.Exit(-1)
-	}
-
-	fmt.Println("All posts have been downloaded and saved to a JSON file!")
-	fmt.Println("Starting analysis...")
-
-	if err := runAnalysisSync(openrouterClient, posts[:2], models[0]); err != nil {
-		fmt.Println("Error running analysis with", models[0], ":", err)
-	}
-
-	if err := runAnalysisSync(openrouterClient, posts[:2], models[1]); err != nil {
-		fmt.Println("Error running analysis with", models[1], ":", err)
-	}
-}
-
-func DownloadFeed(bskyClient *Client, ctx context.Context, path string) []Post {
 	fmt.Println("Starting to Download Feed...")
 
 	postUrls, err := LoadPostURLs(path)
@@ -99,7 +89,7 @@ func runAnalysisSync(c *openrouter.Client, posts []Post, model string) error {
 	defer cancel()
 
 	for i := range posts {
-		fmt.Println("Calculating rating for post:", posts[i].AtURI)
+		fmt.Printf("Calculating rating with model %v for post: %s\n", model, posts[i].AtURI)
 
 		analysis, err := CalculateRating(ctx, c, model, &posts[i])
 		if err != nil {
@@ -108,6 +98,8 @@ func runAnalysisSync(c *openrouter.Client, posts []Post, model string) error {
 		} else {
 			posts[i].ValueAnalysis = *analysis
 		}
+
+		time.Sleep(5 * time.Second)
 	}
 
 	re := regexp.MustCompile(`^[^/]+/(.+)$`)

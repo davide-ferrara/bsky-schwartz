@@ -1,0 +1,626 @@
+[
+ {
+  "URL": "https://bsky.app/profile/pietrosalvatori.bsky.social/post/3mfqzcs2wck2y",
+  "AtURI": "at://did:plc:wf4jxr7n3omzn2nzuc6b66gi/app.bsky.feed.post/3mfqzcs2wck2y",
+  "Text": "Guardare all'Italia per vedere come la pericolosa idea di \"remigrazione\" sta prendendo piede in Europa\n\nsiamo sempre all'avanguardia\n\nwww.theguardian.com/commentisfre...",
+  "CreatedAt": "2026-02-26T10:45:26.219Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": [
+   {
+    "Uri": "https://www.theguardian.com/commentisfree/2026/feb/26/italy-remigration-europe-deportation-far-right?CMP=Share_iOSApp_Other",
+    "Title": "Look to Italy to see how the dangerous idea of ‘remigration’ is taking root in Europe | David Broder",
+    "Description": "To even be talking about this drastic deportation policy is a sign the far right is winning, says author David Broder",
+    "Thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:wf4jxr7n3omzn2nzuc6b66gi/bafkreih6hchgzzezdipujgewwuzxp6rxd6gjlr5yfxq4qoufkbk3jmd3ya"
+   }
+  ],
+  "Facets": [
+   {
+    "Type": "link",
+    "Value": "https://www.theguardian.com/commentisfree/2026/feb/26/italy-remigration-europe-deportation-far-right?CMP=Share_iOSApp_Other"
+   }
+  ],
+  "AuthorName": "Pietro Salvatori",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 0,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 0,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 3,
+    "Nature": 0,
+    "Tolerance": 0
+   },
+   "Reasoning": "The post critiques a political idea ('remigration') and its spread in Europe, reflecting independent thought (4) by challenging a dominant narrative. It also touches on equality (3) by opposing a policy that could undermine social cohesion, but does not strongly support other values like respect, tolerance, or responsibility. The tone is critical rather than action-oriented or humble.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 2382,
+    "prompt_tokens": 1127,
+    "completion_tokens": 265,
+    "total_tokens": 1392,
+    "cost_usd": 0.0003247695,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/mediasit.skyfleet.blue/post/3meqfq4uode22",
+  "AtURI": "at://did:plc:574o3rvmxpg6iq3x5ng2ncgf/app.bsky.feed.post/3meqfq4uode22",
+  "Text": "Negata sala convegni al comitato di estrema destra 'Remigrazione'",
+  "CreatedAt": "2026-02-13T11:29:47.019Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": [
+   {
+    "Uri": "https://www.ansa.it/sito/notizie/politica/2026/02/13/negata-sala-convegni-a-comitato-estrema-destra-remigrazione_2e9bda97-56bc-417e-b2ec-9459760f6420.html",
+    "Title": "Negata sala convegni al comitato di estrema destra 'Remigrazione' - Notizie - Ansa.it",
+    "Description": "Proprietaria hotel: 'Hanno avuto un modo ingannevole di comportarsi' (ANSA)",
+    "Thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:574o3rvmxpg6iq3x5ng2ncgf/bafkreidp4okpbf54eux56i6ooqn3e7xu2enqrdfx5oqro5uusvuvedy4s4"
+   }
+  ],
+  "Facets": null,
+  "AuthorName": "Media 🇮🇹",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 0,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 0,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 3,
+    "Nature": 0,
+    "Tolerance": 6
+   },
+   "Reasoning": "The post describes the denial of a conference hall to an 'extreme right' committee named 'Remigration,' which implies a rejection of their actions or ideology. This reflects a strong commitment to tolerance (6) by preventing the spread of what is likely considered harmful or discriminatory views. It also suggests a moderate commitment to equality (3), as the denial may stem from a desire to uphold social equality and prevent harm to marginalized groups, though this is not explicitly stated.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 2046,
+    "prompt_tokens": 1102,
+    "completion_tokens": 284,
+    "total_tokens": 1386,
+    "cost_usd": 0.000332343,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/pietrosalvatori.bsky.social/post/3meoku5ve722y",
+  "AtURI": "at://did:plc:wf4jxr7n3omzn2nzuc6b66gi/app.bsky.feed.post/3meoku5ve722y",
+  "Text": "\"Via dall'Italia 3,3 milioni di persone\". Il think tank dei supporter della remigrazione quantifica i numeri della deportazione\nwww.huffingtonpost.it/politica/202...",
+  "CreatedAt": "2026-02-12T17:56:11.813Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": [
+   {
+    "Uri": "https://www.huffingtonpost.it/politica/2026/02/12/news/via_dallitalia_35_milioni_di_persone_il_think_tank_dei_supporter_della_remigrazione_quantifica_i_numeri_della_deportazi-21194146/?ref=HHTP-BH-I21097837-P1-S1-F",
+    "Title": "\"Via dall'Italia 3,3 milioni di persone\". Il think tank dei supporter della remigrazione quantifica i numeri della deportazione - HuffPost Italia",
+    "Description": "Per la prima volta il White Paper Policy Institute, think tank legato all'estrema destra americana, quantifica le persone che dovrebbero essere allontanate…",
+    "Thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:wf4jxr7n3omzn2nzuc6b66gi/bafkreighpmmfkcty3ovrj2icjo4n36zcf3oej6o6boqxpgbt37sgyanjnu"
+   }
+  ],
+  "Facets": [
+   {
+    "Type": "link",
+    "Value": "https://www.huffingtonpost.it/politica/2026/02/12/news/via_dallitalia_35_milioni_di_persone_il_think_tank_dei_supporter_della_remigrazione_quantifica_i_numeri_della_deportazi-21194146/?ref=HHTP-BH-I21097837-P1-S1-F"
+   }
+  ],
+  "AuthorName": "Pietro Salvatori",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 4,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 0,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 0,
+    "Nature": 0,
+    "Tolerance": 0
+   },
+   "Reasoning": "The post reflects a strong emphasis on the exercise of power (4) through the advocacy of mass deportation, which implies the right to command and influence over others' lives. It does not reflect independent thought, action, stimulation, pleasure, achievement, wealth, reputation, security, tradition, lawfulness, respect, humility, devotion, responsibility, equality, nature, or tolerance, as the content is focused on exclusionary and coercive policy rather than these values.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 1878,
+    "prompt_tokens": 1145,
+    "completion_tokens": 287,
+    "total_tokens": 1432,
+    "cost_usd": 0.0003405105,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/maurobiani.bsky.social/post/3me7cuyymb22x",
+  "AtURI": "at://did:plc:7h5vha3uimbef4mxva3dluyt/app.bsky.feed.post/3me7cuyymb22x",
+  "Text": "#persone #remigrazione #Vannacci #fascismo #deportazione\nSe il delirio si perde in un buco sempre più profondo, sempre più nero.\nOggi per @mm-repubblica-bot.bsky.social",
+  "CreatedAt": "2026-02-06T16:23:34.214Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": [
+   {
+    "Alt": "",
+    "Image": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:7h5vha3uimbef4mxva3dluyt/bafkreibrv4qy4zw5be6hbcofiie4gpigelpt5sgepbjmvdh4b6lajizdji"
+   }
+  ],
+  "Links": null,
+  "Facets": [
+   {
+    "Type": "tag",
+    "Value": "persone"
+   },
+   {
+    "Type": "tag",
+    "Value": "remigrazione"
+   },
+   {
+    "Type": "tag",
+    "Value": "Vannacci"
+   },
+   {
+    "Type": "tag",
+    "Value": "fascismo"
+   },
+   {
+    "Type": "tag",
+    "Value": "deportazione"
+   },
+   {
+    "Type": "mention",
+    "Value": "did:plc:r4qm2f33x7rwpnvio7ltljtv"
+   }
+  ],
+  "AuthorName": "Mauro Biani",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 0,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 0,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 3,
+    "Nature": 0,
+    "Tolerance": 5
+   },
+   "Reasoning": "The post critiques a political figure (#Vannacci) and a policy (#deportazione) associated with fascism, reflecting independent thought (3) through critical commentary. It also shows a strong stance against intolerance (5) by condemning extremist rhetoric. The mention of #remigrazione suggests a concern for equality (3), though the tone is more dismissive than constructive. Independent action (1) is minimally reflected in the use of hashtags to express dissent. Other concepts like stimulation, pleasure, power, or tradition are not reflected.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 1901,
+    "prompt_tokens": 1078,
+    "completion_tokens": 303,
+    "total_tokens": 1381,
+    "cost_usd": 0.0002074842,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/oxervator.bsky.social/post/3mdwt7koqbs23",
+  "AtURI": "at://did:plc:6gybwl2v7tulfnv2cmdagmzh/app.bsky.feed.post/3mdwt7koqbs23",
+  "Text": "Eccoli, più fascisti dei fascisti. \n\nIl Foglio scrive che la Lega sarebbe prossima a presentare una proposta di legge sulla “remigrazione”: il testo mira al rimpatrio, anche forzato, dei migranti, inclusi quelli regolari, con incentivi al rientro e misure contro chi ha commesso reati.",
+  "CreatedAt": "2026-02-03T07:21:50.539Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": null,
+  "Facets": null,
+  "AuthorName": "Tom Turturro-Travolta-Hawkins",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 0,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 0,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 6,
+    "Nature": 0,
+    "Tolerance": 5
+   },
+   "Reasoning": "The post criticizes a proposed law ('remigrazione') that targets migrants, including those legally residing in Italy, with forced repatriation and incentives for return. This strongly reflects a commitment to EQUALITY by opposing discriminatory policies that violate the rights of migrants. It also reflects TOLERANCE by rejecting exclusionary measures against a marginalized group, emphasizing acceptance of those different from oneself.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 1764,
+    "prompt_tokens": 1100,
+    "completion_tokens": 273,
+    "total_tokens": 1373,
+    "cost_usd": 0.000325512,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/pagellapolitica.it/post/3mduhxv7ltc27",
+  "AtURI": "at://did:plc:vz5gblqrhmroxfjpecxnj566/app.bsky.feed.post/3mduhxv7ltc27",
+  "Text": "La contestata proposta di legge di iniziativa popolare sulla “remigrazione” ha raggiunto le 50 mila firme per essere presentata in Parlamento. Ecco che cosa prevede:",
+  "CreatedAt": "2026-02-02T08:55:22.505Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": [
+   {
+    "Uri": "https://pagellapolitica.it/articoli/remigrazione-proposta-legge-iniziativa-popolare",
+    "Title": "Remigrazione: che cosa prevede la proposta di legge di iniziativa popolare",
+    "Description": "Dopo il blocco della conferenza stampa alla Camera, il testo ha superato le 50 mila firme e sarà presentato in...",
+    "Thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:vz5gblqrhmroxfjpecxnj566/bafkreibkfwc3ashysobphc2vz54tegvaeeh5mc7gaahwat3rxz5wuio274"
+   }
+  ],
+  "Facets": null,
+  "AuthorName": "Pagella Politica",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 0,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 0,
+    "Lawfulness": 6,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 0,
+    "Nature": 0,
+    "Tolerance": 0
+   },
+   "Reasoning": "The post discusses a legislative proposal (lawfulness) being advanced through a formal process (50,000 signatures to be presented in Parliament), reflecting compliance with institutional procedures rather than other values. No evidence of independent thought, stimulation, pleasure, achievement, power, wealth, reputation, security, tradition, respect, humility, devotion, responsibility, equality, nature, or tolerance is present in the text.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 2990,
+    "prompt_tokens": 1120,
+    "completion_tokens": 276,
+    "total_tokens": 1396,
+    "cost_usd": 0.0001976832,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/avvloscerbo.bsky.social/post/3ls74wa6rxk26",
+  "AtURI": "at://did:plc:izzkcyoicwy6i3mn3nswdg2l/app.bsky.feed.post/3ls74wa6rxk26",
+  "Text": "📢 La cittadinanza non si eredita: si conquista.\n💬 #ReImmigrazione è il modello per costruire un'appartenenza reale.\nScopri di più 👉 www.reimmigrazione.com\n#Remigrazione #Integrazione #PoliticheMigratorie",
+  "CreatedAt": "2025-06-22T13:03:23.567Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": [
+   {
+    "Uri": "https://www.reimmigrazione.com",
+    "Title": "Integrazione o ReImmigrazione",
+    "Description": "Serve un nuovo paradigma: ‘Integrazione o ReImmigrazione’. Perché l’immigrazione non è un diritto, l’integrazione è un dovere",
+    "Thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:izzkcyoicwy6i3mn3nswdg2l/bafkreidq6pztek3m57tkpzldrociebrj6ay3xulk6lekpdjpbu3ryp6nqi"
+   }
+  ],
+  "Facets": [
+   {
+    "Type": "tag",
+    "Value": "ReImmigrazione"
+   },
+   {
+    "Type": "link",
+    "Value": "https://www.reimmigrazione.com"
+   },
+   {
+    "Type": "tag",
+    "Value": "Remigrazione"
+   },
+   {
+    "Type": "tag",
+    "Value": "Integrazione"
+   },
+   {
+    "Type": "tag",
+    "Value": "PoliticheMigratorie"
+   }
+  ],
+  "AuthorName": "Avv. Fabio Loscerbo",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 1,
+    "Power": 2,
+    "Wealth": 0,
+    "Achievement": 3,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 2,
+    "Tradition": 0,
+    "Lawfulness": 1,
+    "Respect": 1,
+    "Humility": 0,
+    "Responsibility": 3,
+    "Caring": 0,
+    "Equality": 1,
+    "Nature": 0,
+    "Tolerance": 0
+   },
+   "Reasoning": "The post emphasizes the concept of 'ReImmigrazione' as a model for building real belonging, which reflects INDEPENDENT ACTION (2) and ACHIEVEMENT (3) through the assertion that citizenship must be earned rather than inherited. The mention of a new paradigm suggests STIMULATION (0) but is not strongly reflected. POWER (2) is reflected in the assertion of control over belonging and integration, while RESPONSIBILITY (3) is evident in the framing of integration as a duty. SOCIETAL SECURITY (2) is subtly implied by the focus on a structured approach to immigration. REPUTATION (1), LAWFULNESS (1), and RESPECT (1) are minimally reflected in the emphasis on compliance with the proposed model. EQUALITY (1) is weakly reflected in the idea of earned belonging, while TOLERANCE (0) and NATURE (0) are not addressed. The post does not reflect PLEASURE, HUMILITY, or Devotion to those they care about.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 2722,
+    "prompt_tokens": 1149,
+    "completion_tokens": 420,
+    "total_tokens": 1569,
+    "cost_usd": 0.0002875257,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/akiro75.bsky.social/post/3mhtlla6mt22a",
+  "AtURI": "at://did:plc:fwkofuhgikornsx772txipov/app.bsky.feed.post/3mhtlla6mt22a",
+  "Text": "\"mentre la classe media combatte una guerra immaginaria per difendere la razza o la mascolinità contro la \"grande sostituzione”, l'oligarchia acquisisce gli asset reali del pianeta\"\n\n#musk #thiel",
+  "CreatedAt": "2026-03-24T22:07:59.483Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": null,
+  "Facets": [
+   {
+    "Type": "tag",
+    "Value": "musk"
+   },
+   {
+    "Type": "tag",
+    "Value": "thiel"
+   }
+  ],
+  "AuthorName": "akiro75",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 3,
+    "Wealth": 4,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 1,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 0,
+    "Nature": 0,
+    "Tolerance": 0
+   },
+   "Reasoning": "The post critiques the middle class for fighting a 'war' over race or masculinity while oligarchs acquire real assets, reflecting a strong critique of power structures (POWER: 3) and wealth concentration (WEALTH: 4). It also touches on societal divisions (TRADITION: 1) and independent thought (INDEPENDENT THOUGHT: 2) by challenging mainstream narratives. However, it lacks direct support for other values like equality, nature, or personal security.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 1931,
+    "prompt_tokens": 1080,
+    "completion_tokens": 298,
+    "total_tokens": 1378,
+    "cost_usd": 0.0002048112,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/maurogra.bsky.social/post/3lgd7ksd5s223",
+  "AtURI": "at://did:plc:shfrqvgmrb2bdrhzz44mdm5c/app.bsky.feed.post/3lgd7ksd5s223",
+  "Text": "#Trump ha ragione, è ora di rimandare a casa tutti gli immigrati, hanno ormai invaso tutta l’America\n#immigrazione",
+  "CreatedAt": "2025-01-22T10:59:00.577Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": null,
+  "Facets": [
+   {
+    "Type": "tag",
+    "Value": "Trump"
+   },
+   {
+    "Type": "tag",
+    "Value": "immigrazione"
+   }
+  ],
+  "AuthorName": "Io mi chiamo Mauro",
+  "ReplyRoot": "",
+  "ReplyParent": "",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 1,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 0,
+    "Personal security": 0,
+    "Societal security": 3,
+    "Tradition": 0,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 0,
+    "Nature": 0,
+    "Tolerance": 0
+   },
+   "Reasoning": "The post reflects a strong stance on immigration, emphasizing the idea of 'sending immigrants home' which aligns with societal security (3) as it suggests a desire for stability and control. It also reflects independent thought (1) and action (1) in the sense that it expresses a clear, albeit divisive, opinion. Power (1) is weakly reflected in the assertion of authority over immigration policy. There is no evidence of respect, humility, devotion, responsibility, equality, nature, or tolerance in the post. The tone is confrontational rather than reflective of these values.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 2394,
+    "prompt_tokens": 1056,
+    "completion_tokens": 308,
+    "total_tokens": 1364,
+    "cost_usd": 0.0002071872,
+    "provider": "Mistral"
+   }
+  }
+ },
+ {
+  "URL": "https://bsky.app/profile/pumi2017.bsky.social/post/3m4zu3456322u",
+  "AtURI": "at://did:plc:4c4ea6ncvnuutlykjjatw7ts/app.bsky.feed.post/3m4zu3456322u",
+  "Text": "Ai vari Barbero,\nTravaglio,  Salvini,Conte , Di Battista, Orsini e\n tutta la loro marmaglia di sostenitori auguro notti tormentate dalle anime di queste vittime... \nMeglio ancora sarebbe fargli provare  l' ebrezza di essere inseguiti da un drone russo 🤬",
+  "CreatedAt": "2025-11-07T10:18:52.627Z",
+  "Labels": null,
+  "Langs": [
+   "it"
+  ],
+  "Tags": null,
+  "Images": null,
+  "Links": null,
+  "Facets": null,
+  "AuthorName": "pumi2017.bsky.social",
+  "ReplyRoot": "at://did:plc:jrrwcjy62hysnywvbzg4hn72/app.bsky.feed.post/3m4zti2irjc24",
+  "ReplyParent": "at://did:plc:jrrwcjy62hysnywvbzg4hn72/app.bsky.feed.post/3m4zti2irjc24",
+  "ValueAnalysis": {
+   "Rating": {
+    "Reputation": 0,
+    "Power": 0,
+    "Wealth": 0,
+    "Achievement": 0,
+    "Pleasure": 0,
+    "Independent thoughts": 0,
+    "Independent actions": 0,
+    "Stimulation": 1,
+    "Personal security": 0,
+    "Societal security": 0,
+    "Tradition": 0,
+    "Lawfulness": 0,
+    "Respect": 0,
+    "Humility": 0,
+    "Responsibility": 0,
+    "Caring": 0,
+    "Equality": 0,
+    "Nature": 0,
+    "Tolerance": 0
+   },
+   "Reasoning": "The post expresses violent wishes toward political figures and their supporters, reflecting no support for independent thought, action, or any positive societal values. It does, however, contain a minor element of 'Stimulation' (1) due to the aggressive and confrontational tone, though this is not a constructive form of stimulation.",
+   "Score": 0,
+   "Stats": {
+    "model": "mistralai/mistral-small-2603",
+    "response_time_ms": 1617,
+    "prompt_tokens": 1100,
+    "completion_tokens": 251,
+    "total_tokens": 1351,
+    "cost_usd": 0.0001798632,
+    "provider": "Mistral"
+   }
+  }
+ }
+]

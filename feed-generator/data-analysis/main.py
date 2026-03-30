@@ -1,29 +1,5 @@
 import json
-
-from charts import plot_comparison_chart, plot_radar_chart
-
-
-VALUES = [
-    "sd_thought",
-    "sd_action",
-    "stimulation",
-    "hedonism",
-    "achievement",
-    "dominance",
-    "resources",
-    "face",
-    "personal_sec",
-    "societal_sec",
-    "tradition",
-    "rule_conf",
-    "inter_conf",
-    "humility",
-    "caring",
-    "dependability",
-    "universalism",
-    "nature",
-    "tolerance",
-]
+from charts import plot_values_comparison
 
 
 def load_json(file_path: str):
@@ -36,39 +12,52 @@ def load_json(file_path: str):
     return data
 
 
-def compute_averages(posts: list) -> dict:
-    values_avg = {v: 0.0 for v in VALUES}
+def calculate_values_avg(posts):
+    if not posts:
+        return {}
+
+    values = posts[0]["ValueAnalysis"]["Rating"].copy()
     for post in posts:
-        for value in VALUES:
-            values_avg[value] += float(post["values"][value])
-    for value in VALUES:
-        values_avg[value] /= len(posts)
-    return values_avg
+        curr_values = post["ValueAnalysis"]["Rating"]
+        for v in curr_values:
+            values[v] += curr_values[v]
+            values[v] /= 2
+
+    return values
 
 
 def main():
-    gpt_data = load_json("post_data_gpt.json")
-    gemini_data = load_json("post_data_gemini.json")
+    # Carica i dati
+    gpt_posts = load_json("../post_gpt-4.1-mini_20260330232334.json")
+    gemini_posts = load_json(
+        "../post_gemini-3.1-flash-lite-preview_20260330232401.json"
+    )
+    mistral_posts = load_json("../post_mistral-small-2603_20260330234657.json")
 
-    if gpt_data is None or gemini_data is None:
+    if not gpt_posts or not gemini_posts or not mistral_posts:
         print("Error loading data")
         return
 
     print("Data loaded successfully")
 
-    res = {
-        gpt_data[0]["model"]: compute_averages(gpt_data),
-        gemini_data[0]["model"]: compute_averages(gemini_data),
-    }
+    # Calcola le medie per ogni modello
+    gpt_avg_values = calculate_values_avg(gpt_posts)
+    gemini_avg_values = calculate_values_avg(gemini_posts)
+    mistral_avg_values = calculate_values_avg(mistral_posts)
 
-    print("Averages:")
-    for model, values in res.items():
-        print(f"  {model}:")
-        for k, v in values.items():
-            print(f"    {k}: {v:.2f}")
+    print("GPT averages:", gpt_avg_values)
+    print("\nGemini averages:", gemini_avg_values)
+    print("\nMistral averages:", mistral_avg_values)
 
-    plot_comparison_chart(res, "comparison.png")
-    plot_radar_chart(res, "radar.png")
+    # Genera grafico con 3 modelli
+    plot_values_comparison(
+        avg_values={
+            "GPT-4.1-mini": gpt_avg_values,
+            "Gemini-3.1-flash": gemini_avg_values,
+            "Mistral-Small": mistral_avg_values,
+        },
+        output_path="comparison_3models.png",
+    )
 
 
 if __name__ == "__main__":
