@@ -35,15 +35,6 @@ func BuildPromptContent(post *Post) string {
 	return fmt.Sprintf("<post>\n%s\n</post>", jsonBytes)
 }
 
-func cleanMarkdown(s string) string {
-	s = strings.TrimPrefix(s, "```json\n")
-	s = strings.TrimPrefix(s, "```\n")
-	s = strings.TrimPrefix(s, "```")
-	s = strings.TrimSuffix(s, "\n```")
-	s = strings.TrimSuffix(s, "```")
-	return strings.TrimSpace(s)
-}
-
 func CalculateRating(ctx context.Context, client *openrouter.Client, model string, post *Post) (*ValueAnalysis, error) {
 	start := time.Now()
 
@@ -72,7 +63,6 @@ func CalculateRating(ctx context.Context, client *openrouter.Client, model strin
 	elapsed := time.Since(start)
 
 	jsonStr := resp.Choices[0].Message.Content.Text
-	jsonStr = cleanMarkdown(jsonStr)
 
 	var result struct {
 		Rating    SchwartzValues `json:"Rating"`

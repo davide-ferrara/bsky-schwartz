@@ -15,16 +15,22 @@ values using AI, then calculates alignment scores based on configurable weights.
 ## 2. Core Architecture
 
 ```
-pkg/
-├── scorer/          # Core scoring logic and AI integration
-│   ├── scorer.go    # Score calculation and AI prompting
-│   ├── types.go     # Data structures (FeedItem, SchwartzValues, Config)
-├── bluesky/         # Bluesky Social API client
-│   ├── client.go    # Query posts, threads, and social features
+internal/
+├── config.go    # Configuration and feeds loading
+├── client.go    # Bluesky API client
+├── scorer.go    # Scoring logic and AI integration
+├── logger.go    # Structured logging
+├── prompts.go   # Prompt caching
 
 cmd/
-└── server/          # HTTP API server
-    └── main.go
+└── feedgen/
+    └── main.go   # CLI entry point
+
+prompts/
+├── SCHWARTZ.md      # Full Schwartz values definition
+├── SCHWARTZ_LITE.md # Simplified Schwartz values
+├── PROMPT.md        # v1 AI prompt
+└── PROMPT_V2.md     # v2 AI prompt
 ```
 
 ---
@@ -59,26 +65,14 @@ cmd/
 
 | Component       | Technology                                          |
 | :-------------- | :-------------------------------------------------- |
-| **Language**    | Go 1.21+                                          |
-| **HTTP**        | Gin Web Framework                                   |
-| **Data Stream** | Bluesky API (via `github.com/bluesky-social/indigo`) |
-| **AI/ML**      | OpenRouter API (supports OpenAI, Anthropic, etc.)  |
-| **Protocol**    | AT Protocol (Authenticated Transfer)                 |
+| **Language**    | Go 1.26+                                          |
+| **CLI**         | Native Go CLI                                       |
+| **Bluesky API** | `github.com/bluesky-social/indigo`                  |
+| **AI/ML**       | OpenRouter API (supports OpenAI, Anthropic, etc.)  |
 
 ---
 
-## 5. API Endpoints
-
-| Method | Endpoint                 | Description                              |
-| ------ | ------------------------ | ---------------------------------------- |
-| `GET`  | `/health`                | Health check                             |
-| `GET`  | `/api/analysis`          | Search posts and analyze with Schwartz    |
-| `GET`  | `/api/search`           | Search and return only post URIs         |
-| `GET`  | `/api/analysis/by-uri`  | Get a single post by URI and analyze     |
-
----
-
-## 6. Scoring System
+## 5. Scoring System
 
 Each value is scored 0-6:
 
@@ -95,43 +89,46 @@ score = Σ(value_i × weight_i)
 
 ---
 
-## 7. Configuration
+## 6. Configuration
 
-Weights are configured in `config.json` under the `weights` section, organized by
-political orientation (e.g., `left`, `right`). Each weight can be positive or
-negative, allowing the score to reflect alignment or opposition to certain values.
+- `config.json` - Models, weights, and AI prompt configuration
+- `feeds.json` - List of feed URLs to process
+- `.env` - Environment variables (BSKY_HANDLE, BSKY_APP_PASSWORD, OPEN_ROUTER_KEY)
 
 ---
 
-## 8. API Usage Examples
+## 7. Usage
 
 ```bash
-# Health check
-curl http://localhost:8080/health
+# Run with defaults
+make run
 
-# Search posts and analyze with default model (gpt)
-curl "http://localhost:8080/api/analysis?query=cats&limit=2"
+# Run with custom options
+./bin/feedgen -config config.json -feeds feeds.json -model gpt -log info
 
-# Search with specific model (URL must be quoted due to &)
-curl "http://localhost:8080/api/analysis?query=trump&model=gemini3"
-
-# Get formatted JSON output with jq
-curl "http://localhost:8080/api/analysis?query=trump&model=gemini3" | jq .
-
-# Save formatted JSON to file
-curl "http://localhost:8080/api/analysis?query=trump&model=gemini3" | jq . > data.json
+# Build binary
+make build
 ```
 
-Available models are defined in `config.json`:
-- `gpt` - openai/gpt-4o-mini
-- `qwen` - qwen/qwen-2.5-72b-instruct
-- `qwen3` - qwen/qwen3.5-35b-a3b
-- `minimax` - minimax/minimax-m2.5
-- `gemini3` - google/gemini-3.1-flash-lite-preview
+### CLI Flags
+
+| Flag      | Default       | Description                    |
+| --------- | ------------- | ------------------------------ |
+| `-config` | `config.json` | Path to config file            |
+| `-feeds`  | `feeds.json`  | Path to feeds file             |
+| `-model`  | `gpt`         | Model key from config          |
+| `-log`    | `info`        | Log level (debug/info/warn/error) |
+
+### Environment Variables
+
+Required in `.env`:
+- `BSKY_HANDLE` - Bluesky handle
+- `BSKY_APP_PASSWORD` - Bluesky app password
+- `OPEN_ROUTER_KEY` - OpenRouter API key
 
 ---
 
-## 9. Build & Run Commands
+## 8. Build & Run Commands
 
 - **Build:** `make build`
 - **Run:** `make run`
@@ -139,5 +136,3 @@ Available models are defined in `config.json`:
 - **Test:** `make test`
 
 Always use `make build` to compile instead of `go build` directly.
-
----

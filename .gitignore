@@ -23,12 +23,34 @@ go.work
 # Environment
 .env
 
+# Binaries
+bin/
+feed-generator/bin/
+feed-service/feed-service
+feed-publish/
+
 # Logs
 logs/
+feed-generator/logs/
 
-data-analysis/__pycache__/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ruff_cache/
+
+# Python virtual environments
+.venv/
+
+# Analysis outputs
+data-analysis/results/*.json
+data-analysis/results/*.png
+!data-analysis/results/.gitkeep
 data-analysis/*.png
-bin/
-data-analysis/__pycache__/
-data-analysis/*.png
-data-analysis/.venv/
+
+# Temporary test files
+config.json.backup
+
+# Feed service test
+feed-service/test_feed.sh
