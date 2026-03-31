@@ -1,6 +1,7 @@
 import json
 import os
 import glob
+from collections import Counter
 from charts import plot_values_comparison
 from spider import plot_spider_chart
 
@@ -26,6 +27,7 @@ def load_json(file_path: str):
 
 
 def calculate_values_avg(posts):
+    """Calculate average values for each Schwartz dimension."""
     if not posts:
         return {}
 
@@ -37,6 +39,25 @@ def calculate_values_avg(posts):
             values[v] /= 2
 
     return values
+
+
+def calculate_values_mode(posts):
+    """Calculate mode (most frequent value) for each Schwartz dimension."""
+    if not posts:
+        return {}
+
+    # Get all value names from first post
+    value_names = list(posts[0]["ValueAnalysis"]["Rating"].keys())
+
+    mode_values = {}
+    for name in value_names:
+        # Collect all values for this dimension
+        all_values = [post["ValueAnalysis"]["Rating"][name] for post in posts]
+        # Find most common value (mode)
+        counter = Counter(all_values)
+        mode_values[name] = counter.most_common(1)[0][0]
+
+    return mode_values
 
 
 def main():
@@ -81,10 +102,21 @@ def main():
     deepseek_avg_values = calculate_values_avg(deepseek_posts)
     qwen_avg_values = calculate_values_avg(qwen_posts)
 
+    # Calcola le mode per ogni modello
+    gpt_mode_values = calculate_values_mode(gpt_posts)
+    mistral_mode_values = calculate_values_mode(mistral_posts)
+    deepseek_mode_values = calculate_values_mode(deepseek_posts)
+    qwen_mode_values = calculate_values_mode(qwen_posts)
+
     print("GPT averages:", gpt_avg_values)
     print("\nMistral averages:", mistral_avg_values)
     print("\nDeepSeek averages:", deepseek_avg_values)
     print("\nQwen averages:", qwen_avg_values)
+
+    print("\nGPT mode:", gpt_mode_values)
+    print("\nMistral mode:", mistral_mode_values)
+    print("\nDeepSeek mode:", deepseek_mode_values)
+    print("\nQwen mode:", qwen_mode_values)
 
     # Spider plot individuali
     plot_spider_chart(
@@ -143,7 +175,7 @@ def main():
         output_path="spider_4_models.png",
     )
 
-    # Bar chart combinato
+    # Bar chart combinato (average)
     plot_values_comparison(
         avg_values={
             "GPT-4.1-mini": gpt_avg_values,
@@ -152,6 +184,82 @@ def main():
             "Qwen3": qwen_avg_values,
         },
         output_path="comparison_4_models.png",
+    )
+
+    # =====================================
+    # MODE PLOTS
+    # =====================================
+
+    print("\n" + "=" * 50)
+    print("Generating MODE plots...")
+    print("=" * 50)
+
+    # Spider plot individuali (mode)
+    plot_spider_chart(
+        avg_values={"GPT-4.1-mini": gpt_mode_values},
+        output_path="spider_gpt_mode.png",
+        title="GPT-4.1-mini - Schwartz Values (Mode)",
+    )
+
+    plot_spider_chart(
+        avg_values={"Mistral-14b": mistral_mode_values},
+        output_path="spider_mistral_mode.png",
+        title="Mistral-14b - Schwartz Values (Mode)",
+    )
+
+    plot_spider_chart(
+        avg_values={"DeepSeek": deepseek_mode_values},
+        output_path="spider_deepseek_mode.png",
+        title="DeepSeek - Schwartz Values (Mode)",
+    )
+
+    plot_spider_chart(
+        avg_values={"Qwen3": qwen_mode_values},
+        output_path="spider_qwen_mode.png",
+        title="Qwen3 - Schwartz Values (Mode)",
+    )
+
+    # Bar chart individuali (mode)
+    plot_values_comparison(
+        avg_values={"GPT-4.1-mini": gpt_mode_values},
+        output_path="bar_gpt_mode.png",
+    )
+
+    plot_values_comparison(
+        avg_values={"Mistral-14b": mistral_mode_values},
+        output_path="bar_mistral_mode.png",
+    )
+
+    plot_values_comparison(
+        avg_values={"DeepSeek": deepseek_mode_values},
+        output_path="bar_deepseek_mode.png",
+    )
+
+    plot_values_comparison(
+        avg_values={"Qwen3": qwen_mode_values},
+        output_path="bar_qwen_mode.png",
+    )
+
+    # Spider plot combinato (mode)
+    plot_spider_chart(
+        avg_values={
+            "GPT-4.1-mini": gpt_mode_values,
+            "Mistral-14b": mistral_mode_values,
+            "DeepSeek": deepseek_mode_values,
+            "Qwen3": qwen_mode_values,
+        },
+        output_path="spider_4_models_mode.png",
+    )
+
+    # Bar chart combinato (mode)
+    plot_values_comparison(
+        avg_values={
+            "GPT-4.1-mini": gpt_mode_values,
+            "Mistral-14b": mistral_mode_values,
+            "DeepSeek": deepseek_mode_values,
+            "Qwen3": qwen_mode_values,
+        },
+        output_path="comparison_4_models_mode.png",
     )
 
 
