@@ -1,0 +1,42 @@
+package views
+
+import "web/internal/models"
+
+templ SlidersPage(username string) {
+	@Layout("Schwartz Values - Sovranità Algoritmica", username) {
+		<hgroup>
+			<h1>Valori di Schwartz</h1>
+			<p>Regola i valori che preferisci all'interno del tuo Feed</p>
+		</hgroup>
+
+		<form action="/preferences" method="post">
+			<article>
+				<header>Regola gli slider secondo le tue preferenze</header>
+				<div class="grid">
+					<div>
+						<h3>Autotrascendenza</h3>
+						@ValueGroup(models.GetValuesByCluster("Self-Transcendence"))
+					</div>
+					<div>
+						<h3>Conservazione</h3>
+						@ValueGroup(models.GetValuesByCluster("Conservation"))
+					</div>
+				</div>
+				<div class="grid">
+					<div>
+						<h3>Autoaffermazione</h3>
+						@ValueGroup(models.GetValuesByCluster("Self-Enhancement"))
+					</div>
+					<div>
+						<h3>Apertura al cambiamento</h3>
+						@ValueGroup(models.GetValuesByCluster("Openness to Change"))
+					</div>
+				</div>
+			</article>
+			
+			<article>
+				<button type="submit">Salva preferenze</button>
+			</article>
+		</form>
+	}
+}

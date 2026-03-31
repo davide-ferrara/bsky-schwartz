@@ -1,0 +1,32 @@
+package views
+
+import "web/internal/models"
+
+templ ValueSlider(value models.SwartzValue) {
+	<label>
+		{ value.Name }
+		<span style="float: right; color: var(--muted-color);" id={ "value-" + value.ID }>{ formatFloat(value.Weight) }</span>
+		<div style="display: flex; align-items: center; gap: 0.5rem;">
+			<span style="color: var(--muted-color); font-size: 0.875rem;">meno</span>
+			<input 
+				type="range" 
+				name={ value.ID }
+				value={ formatFloat(value.Weight) }
+				step="0.25" 
+				min="-1" 
+				max="1"
+				style="flex: 1;"
+				data-value-id={ value.ID }
+			/>
+			<span style="color: var(--muted-color); font-size: 0.875rem;">più</span>
+		</div>
+	</label>
+}
+
+templ ValueGroup(values []models.SwartzValue) {
+	<div>
+		for _, v := range values {
+			@ValueSlider(v)
+		}
+	</div>
+}

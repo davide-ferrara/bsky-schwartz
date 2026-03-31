@@ -1,0 +1,56 @@
+package views
+
+import "web/internal/models"
+
+templ ValuesPage() {
+	@Layout("I Valori di Schwartz - Sovranità Algoritmica", "") {
+		<hgroup>
+			<h1>I 19 Valori di Schwartz</h1>
+			<p>La Teoria dei Valori Basici di Schwartz identifica 19 valori universali che guidano il comportamento umano.</p>
+		</hgroup>
+
+		<div class="grid">
+			<article>
+				<h2>Autotrascendenza</h2>
+				<p style="font-size: 0.875rem; color: var(--muted-color); margin-bottom: 1rem;">
+					Valori che trascendono l'ego e promuovono il benessere degli altri e della società.
+				</p>
+				for _, v := range models.GetValuesByCluster("Self-Transcendence") {
+					<p><strong>{ v.Name }</strong><br/><small>{ v.Description }</small></p>
+				}
+			</article>
+
+			<article>
+				<h2>Conservazione</h2>
+				<p style="font-size: 0.875rem; color: var(--muted-color); margin-bottom: 1rem;">
+					Valori che preservano l'ordine sociale e le tradizioni.
+				</p>
+				for _, v := range models.GetValuesByCluster("Conservation") {
+					<p><strong>{ v.Name }</strong><br/><small>{ v.Description }</small></p>
+				}
+			</article>
+		</div>
+
+		<div class="grid">
+			<article>
+				<h2>Autoaffermazione</h2>
+				<p style="font-size: 0.875rem; color: var(--muted-color); margin-bottom: 1rem;">
+					Valori che promuovono il proprio interesse e il successo personale.
+				</p>
+				for _, v := range models.GetValuesByCluster("Self-Enhancement") {
+					<p><strong>{ v.Name }</strong><br/><small>{ v.Description }</small></p>
+				}
+			</article>
+
+			<article>
+				<h2>Apertura al cambiamento</h2>
+				<p style="font-size: 0.875rem; color: var(--muted-color); margin-bottom: 1rem;">
+					Valori che promuovono l'autonomia e la libertà di pensiero e azione.
+				</p>
+				for _, v := range models.GetValuesByCluster("Openness to Change") {
+					<p><strong>{ v.Name }</strong><br/><small>{ v.Description }</small></p>
+				}
+			</article>
+		</div>
+	}
+}

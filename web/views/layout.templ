@@ -1,0 +1,43 @@
+package views
+
+templ Layout(title string, username string) {
+	<!DOCTYPE html>
+	<html lang="it">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
+		</head>
+<body>
+			<nav class="container">
+				<ul>
+					<li><a href="/" class="contrast"><strong>Sovranità Algoritmica</strong></a></li>
+				</ul>
+				<ul>
+					<li><a href="/values" class="contrast">I Valori</a></li>
+					<li><a href="https://github.com/davide-ferrara/bsky-schwartz" class="contrast">GitHub</a></li>
+					if username != "" {
+						<li><a href="/logout">Logout</a></li>
+					} else {
+						<li><a href="/login" role="button">Accedi con Bluesky</a></li>
+					}
+				</ul>
+			</nav>
+			<main class="container">
+				{ children... }
+			</main>
+			<script>
+				document.querySelectorAll('input[type="range"][data-value-id]').forEach(function(input) {
+					input.addEventListener('input', function() {
+						var valueId = this.getAttribute('data-value-id');
+						var valueSpan = document.getElementById('value-' + valueId);
+						if (valueSpan) {
+							valueSpan.textContent = parseFloat(this.value).toFixed(2);
+						}
+					});
+				});
+			</script>
+		</body>
+	</html>
+}

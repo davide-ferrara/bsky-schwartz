@@ -1,0 +1,27 @@
+package views
+
+templ LoginPage() {
+	@Layout("Login - Sovranità Algoritmica", "") {
+		<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
+			<article style="max-width: 600px;">
+				<div style="margin-bottom: 2rem;">
+					<img src="/static/bluesky-logo.png" alt="Bluesky Logo" style="width: 80px; height: 80px;"/>
+				</div>
+				
+				<hgroup>
+					<h1>Sovranità Algoritmica</h1>
+					<p style="font-size: 0.95rem; line-height: 1.6;">
+						Questo esperimento ti permette di <strong>personalizzare il tuo feed di Bluesky</strong> basandosi sui tuoi valori personali secondo la<br/>
+						<em>Teoria dei Valori di Schwartz</em>.<br/><br/>
+						Invece di un algoritmo che decide cosa vedi basandosi sull'engagement, qui decidi <strong>tu</strong> quali valori promuovere: libertà, tradizione, altruismo, sicurezza...<br/><br/>
+						<strong>Sei tu a scegliere i pesi, non l'algoritmo.</strong>
+					</p>
+				</hgroup>
+				
+				<a href="/auth/bsky" role="button" style="width: 100%; margin-top: 1.5rem;">
+					<strong>Accedi con Bluesky</strong>
+				</a>
+			</article>
+		</div>
+	}
+}
