@@ -200,3 +200,127 @@ def plot_values_comparison(
     plt.close()
 
     print(f"Chart saved to: {output_path}")
+
+
+def plot_costs_comparison(
+    costs: dict[str, dict[str, float]],
+    output_path: str,
+    title: str = "Average Cost per Model (USD)",
+) -> None:
+    """
+    Genera un bar chart per confrontare i costi medi per modello.
+
+    Args:
+        costs: Dizionario {modello: {"avg_cost": x, "total_cost": y, "num_posts": z}}
+        output_path: Path dove salvare il PNG
+        title: Titolo del grafico
+    """
+    models = list(costs.keys())
+    avg_costs = [costs[m]["avg_cost"] for m in models]
+
+    colors = [
+        MODEL_COLORS.get(m, MODEL_COLORS.get(m.split("-")[0].capitalize(), "#666666"))
+        for m in models
+    ]
+
+    sns.set_theme(style="whitegrid")
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    bars = ax.bar(models, avg_costs, color=colors, edgecolor="white", alpha=0.9)
+
+    for bar, cost in zip(bars, avg_costs):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.0001,
+            f"${cost:.6f}",
+            ha="center",
+            va="bottom",
+            fontsize=10,
+            fontweight="bold",
+        )
+
+    ax.set_ylabel("Average Cost (USD)", fontsize=12, fontweight="bold")
+    ax.set_title(title, fontsize=14, fontweight="bold", pad=20)
+    ax.set_ylim(0, max(avg_costs) * 1.2)
+
+    # Add total cost info
+    for i, m in enumerate(models):
+        total = costs[m].get("total_cost", 0)
+        num = costs[m].get("num_posts", 0)
+        ax.text(
+            i,
+            -max(avg_costs) * 0.1,
+            f"Total: ${total:.4f}\n({num} posts)",
+            ha="center",
+            va="top",
+            fontsize=8,
+            color="gray",
+        )
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    print(f"Cost chart saved to: {output_path}")
+
+
+def plot_response_time_comparison(
+    times: dict[str, dict[str, float]],
+    output_path: str,
+    title: str = "Average Response Time per Model (ms)",
+) -> None:
+    """
+    Genera un bar chart per confrontare i tempi di risposta medi per modello.
+
+    Args:
+        times: Dizionario {modello: {"avg_time_ms": x, "total_time_ms": y, "num_posts": z}}
+        output_path: Path dove salvare il PNG
+        title: Titolo del grafico
+    """
+    models = list(times.keys())
+    avg_times = [times[m]["avg_time_ms"] for m in models]
+
+    colors = [
+        MODEL_COLORS.get(m, MODEL_COLORS.get(m.split("-")[0].capitalize(), "#666666"))
+        for m in models
+    ]
+
+    sns.set_theme(style="whitegrid")
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    bars = ax.bar(models, avg_times, color=colors, edgecolor="white", alpha=0.9)
+
+    for bar, t in zip(bars, avg_times):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + max(avg_times) * 0.02,
+            f"{t:.0f}ms",
+            ha="center",
+            va="bottom",
+            fontsize=10,
+            fontweight="bold",
+        )
+
+    ax.set_ylabel("Average Response Time (ms)", fontsize=12, fontweight="bold")
+    ax.set_title(title, fontsize=14, fontweight="bold", pad=20)
+    ax.set_ylim(0, max(avg_times) * 1.2)
+
+    # Add total time info
+    for i, m in enumerate(models):
+        total = times[m].get("total_time_ms", 0)
+        num = times[m].get("num_posts", 0)
+        ax.text(
+            i,
+            -max(avg_times) * 0.1,
+            f"Total: {total / 1000:.1f}s\n({num} posts)",
+            ha="center",
+            va="top",
+            fontsize=8,
+            color="gray",
+        )
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    print(f"Response time chart saved to: {output_path}")

@@ -2,7 +2,11 @@ import json
 import os
 import glob
 from collections import Counter
-from charts import plot_values_comparison
+from charts import (
+    plot_values_comparison,
+    plot_costs_comparison,
+    plot_response_time_comparison,
+)
 from spider import plot_spider_chart
 
 
@@ -59,6 +63,42 @@ def calculate_values_mode(posts):
         mode_values[name] = counter.most_common(1)[0][0]
 
     return mode_values
+
+
+def calculate_cost_stats(posts):
+    """Calculate average and total cost for model."""
+    if not posts:
+        return {}
+
+    total_cost = 0
+    for post in posts:
+        total_cost += post["ValueAnalysis"]["Stats"]["CostUsd"]
+
+    avg_cost = total_cost / len(posts)
+
+    return {
+        "avg_cost": avg_cost,
+        "total_cost": total_cost,
+        "num_posts": len(posts),
+    }
+
+
+def calculate_time_stats(posts):
+    """Calculate average and total response time for model."""
+    if not posts:
+        return {}
+
+    total_time = 0
+    for post in posts:
+        total_time += post["ValueAnalysis"]["Stats"]["ResponseTimeMs"]
+
+    avg_time = total_time / len(posts)
+
+    return {
+        "avg_time_ms": avg_time,
+        "total_time_ms": total_time,
+        "num_posts": len(posts),
+    }
 
 
 def main():
@@ -118,6 +158,47 @@ def main():
     print("\nMistral mode:", mistral_mode_values)
     print("\nDeepSeek mode:", deepseek_mode_values)
     print("\nQwen mode:", qwen_mode_values)
+
+    # Calcola statistiche costi e tempi
+    gpt_cost = calculate_cost_stats(gpt_posts)
+    mistral_cost = calculate_cost_stats(mistral_posts)
+    deepseek_cost = calculate_cost_stats(deepseek_posts)
+    qwen_cost = calculate_cost_stats(qwen_posts)
+
+    gpt_time = calculate_time_stats(gpt_posts)
+    mistral_time = calculate_time_stats(mistral_posts)
+    deepseek_time = calculate_time_stats(deepseek_posts)
+    qwen_time = calculate_time_stats(qwen_posts)
+
+    print("\n" + "=" * 50)
+    print("COST STATISTICS")
+    print("=" * 50)
+    print(f"GPT: avg=${gpt_cost['avg_cost']:.6f}, total=${gpt_cost['total_cost']:.4f}")
+    print(
+        f"Mistral: avg=${mistral_cost['avg_cost']:.6f}, total=${mistral_cost['total_cost']:.4f}"
+    )
+    print(
+        f"DeepSeek: avg=${deepseek_cost['avg_cost']:.6f}, total=${deepseek_cost['total_cost']:.4f}"
+    )
+    print(
+        f"Qwen: avg=${qwen_cost['avg_cost']:.6f}, total=${qwen_cost['total_cost']:.4f}"
+    )
+
+    print("\n" + "=" * 50)
+    print("RESPONSE TIME STATISTICS")
+    print("=" * 50)
+    print(
+        f"GPT: avg={gpt_time['avg_time_ms']:.0f}ms, total={gpt_time['total_time_ms'] / 1000:.1f}s"
+    )
+    print(
+        f"Mistral: avg={mistral_time['avg_time_ms']:.0f}ms, total={mistral_time['total_time_ms'] / 1000:.1f}s"
+    )
+    print(
+        f"DeepSeek: avg={deepseek_time['avg_time_ms']:.0f}ms, total={deepseek_time['total_time_ms'] / 1000:.1f}s"
+    )
+    print(
+        f"Qwen: avg={qwen_time['avg_time_ms']:.0f}ms, total={qwen_time['total_time_ms'] / 1000:.1f}s"
+    )
 
     # Spider plot individuali
     plot_spider_chart(
@@ -261,6 +342,36 @@ def main():
             "Qwen3": qwen_mode_values,
         },
         output_path="comparison_4_models_mode.png",
+    )
+
+    # =====================================
+    # COST AND TIME PLOTS
+    # =====================================
+
+    print("\n" + "=" * 50)
+    print("Generating cost and time plots...")
+    print("=" * 50)
+
+    # Cost comparison plot
+    plot_costs_comparison(
+        costs={
+            "GPT-4.1-mini": gpt_cost,
+            "Mistral-14b": mistral_cost,
+            "DeepSeek": deepseek_cost,
+            "Qwen3": qwen_cost,
+        },
+        output_path="comparison_costs.png",
+    )
+
+    # Response time comparison plot
+    plot_response_time_comparison(
+        times={
+            "GPT-4.1-mini": gpt_time,
+            "Mistral-14b": mistral_time,
+            "DeepSeek": deepseek_time,
+            "Qwen3": qwen_time,
+        },
+        output_path="comparison_response_time.png",
     )
 
 
