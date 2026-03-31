@@ -31,14 +31,15 @@ def calculate_values_avg(posts):
     if not posts:
         return {}
 
-    values = posts[0]["ValueAnalysis"]["Rating"].copy()
-    for post in posts:
-        curr_values = post["ValueAnalysis"]["Rating"]
-        for v in curr_values:
-            values[v] += curr_values[v]
-            values[v] /= 2
+    # Get all value names from first post
+    value_names = list(posts[0]["ValueAnalysis"]["Rating"].keys())
 
-    return values
+    avg_values = {}
+    for name in value_names:
+        total = sum(post["ValueAnalysis"]["Rating"][name] for post in posts)
+        avg_values[name] = total / len(posts)
+
+    return avg_values
 
 
 def calculate_values_mode(posts):
