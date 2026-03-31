@@ -201,29 +201,29 @@ def main():
     )
 
     # Spider plot individuali
-    plot_spider_chart(
-        avg_values={"GPT-4.1-mini": gpt_avg_values},
-        output_path="spider_gpt.png",
-        title="GPT-4.1-mini - Schwartz Values",
-    )
+    # plot_spider_chart(
+    #     avg_values={"GPT-4.1-mini": gpt_avg_values},
+    #     output_path="spider_gpt.png",
+    #     title="GPT-4.1-mini - Schwartz Values",
+    # )
 
-    plot_spider_chart(
-        avg_values={"Mistral-14b": mistral_avg_values},
-        output_path="spider_mistral.png",
-        title="Mistral-14b - Schwartz Values",
-    )
+    # plot_spider_chart(
+    #     avg_values={"Mistral-14b": mistral_avg_values},
+    #     output_path="spider_mistral.png",
+    #     title="Mistral-14b - Schwartz Values",
+    # )
 
-    plot_spider_chart(
-        avg_values={"DeepSeek": deepseek_avg_values},
-        output_path="spider_deepseek.png",
-        title="DeepSeek - Schwartz Values",
-    )
+    # plot_spider_chart(
+    #     avg_values={"DeepSeek": deepseek_avg_values},
+    #     output_path="spider_deepseek.png",
+    #     title="DeepSeek - Schwartz Values",
+    # )
 
-    plot_spider_chart(
-        avg_values={"Qwen3": qwen_avg_values},
-        output_path="spider_qwen.png",
-        title="Qwen3 - Schwartz Values",
-    )
+    # plot_spider_chart(
+    #     avg_values={"Qwen3": qwen_avg_values},
+    #     output_path="spider_qwen.png",
+    #     title="Qwen3 - Schwartz Values",
+    # )
 
     # Bar chart individuali
     plot_values_comparison(
@@ -247,15 +247,15 @@ def main():
     )
 
     # Spider plot combinato
-    plot_spider_chart(
-        avg_values={
-            "GPT-4.1-mini": gpt_avg_values,
-            "Mistral-14b": mistral_avg_values,
-            "DeepSeek": deepseek_avg_values,
-            "Qwen3": qwen_avg_values,
-        },
-        output_path="spider_4_models.png",
-    )
+    # plot_spider_chart(
+    #     avg_values={
+    #         "GPT-4.1-mini": gpt_avg_values,
+    #         "Mistral-14b": mistral_avg_values,
+    #         "DeepSeek": deepseek_avg_values,
+    #         "Qwen3": qwen_avg_values,
+    #     },
+    #     output_path="spider_4_models.png",
+    # )
 
     # Bar chart combinato (average)
     plot_values_comparison(
@@ -277,29 +277,29 @@ def main():
     print("=" * 50)
 
     # Spider plot individuali (mode)
-    plot_spider_chart(
-        avg_values={"GPT-4.1-mini": gpt_mode_values},
-        output_path="spider_gpt_mode.png",
-        title="GPT-4.1-mini - Schwartz Values (Mode)",
-    )
+    # plot_spider_chart(
+    #     avg_values={"GPT-4.1-mini": gpt_mode_values},
+    #     output_path="spider_gpt_mode.png",
+    #     title="GPT-4.1-mini - Schwartz Values (Mode)",
+    # )
 
-    plot_spider_chart(
-        avg_values={"Mistral-14b": mistral_mode_values},
-        output_path="spider_mistral_mode.png",
-        title="Mistral-14b - Schwartz Values (Mode)",
-    )
+    # plot_spider_chart(
+    #     avg_values={"Mistral-14b": mistral_mode_values},
+    #     output_path="spider_mistral_mode.png",
+    #     title="Mistral-14b - Schwartz Values (Mode)",
+    # )
 
-    plot_spider_chart(
-        avg_values={"DeepSeek": deepseek_mode_values},
-        output_path="spider_deepseek_mode.png",
-        title="DeepSeek - Schwartz Values (Mode)",
-    )
+    # plot_spider_chart(
+    #     avg_values={"DeepSeek": deepseek_mode_values},
+    #     output_path="spider_deepseek_mode.png",
+    #     title="DeepSeek - Schwartz Values (Mode)",
+    # )
 
-    plot_spider_chart(
-        avg_values={"Qwen3": qwen_mode_values},
-        output_path="spider_qwen_mode.png",
-        title="Qwen3 - Schwartz Values (Mode)",
-    )
+    # plot_spider_chart(
+    #     avg_values={"Qwen3": qwen_mode_values},
+    #     output_path="spider_qwen_mode.png",
+    #     title="Qwen3 - Schwartz Values (Mode)",
+    # )
 
     # Bar chart individuali (mode)
     plot_values_comparison(
@@ -323,15 +323,15 @@ def main():
     )
 
     # Spider plot combinato (mode)
-    plot_spider_chart(
-        avg_values={
-            "GPT-4.1-mini": gpt_mode_values,
-            "Mistral-14b": mistral_mode_values,
-            "DeepSeek": deepseek_mode_values,
-            "Qwen3": qwen_mode_values,
-        },
-        output_path="spider_4_models_mode.png",
-    )
+    # plot_spider_chart(
+    #     avg_values={
+    #         "GPT-4.1-mini": gpt_mode_values,
+    #         "Mistral-14b": mistral_mode_values,
+    #         "DeepSeek": deepseek_mode_values,
+    #         "Qwen3": qwen_mode_values,
+    #     },
+    #     output_path="spider_4_models_mode.png",
+    # )
 
     # Bar chart combinato (mode)
     plot_values_comparison(
