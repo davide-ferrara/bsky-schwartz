@@ -111,6 +111,27 @@ def main():
         title="Qwen3 - Schwartz Values",
     )
 
+    # Bar chart individuali
+    plot_values_comparison(
+        avg_values={"GPT-4.1-mini": gpt_avg_values},
+        output_path="bar_gpt.png",
+    )
+
+    plot_values_comparison(
+        avg_values={"Mistral-14b": mistral_avg_values},
+        output_path="bar_mistral.png",
+    )
+
+    plot_values_comparison(
+        avg_values={"DeepSeek": deepseek_avg_values},
+        output_path="bar_deepseek.png",
+    )
+
+    plot_values_comparison(
+        avg_values={"Qwen3": qwen_avg_values},
+        output_path="bar_qwen.png",
+    )
+
     # Spider plot combinato
     plot_spider_chart(
         avg_values={
