@@ -72,7 +72,7 @@ def calculate_cost_stats(posts):
 
     total_cost = 0
     for post in posts:
-        total_cost += post["ValueAnalysis"]["Stats"]["CostUsd"]
+        total_cost += post["ValueAnalysis"]["Stats"]["cost_usd"]
 
     avg_cost = total_cost / len(posts)
 
@@ -90,7 +90,7 @@ def calculate_time_stats(posts):
 
     total_time = 0
     for post in posts:
-        total_time += post["ValueAnalysis"]["Stats"]["ResponseTimeMs"]
+        total_time += post["ValueAnalysis"]["Stats"]["response_time_ms"]
 
     avg_time = total_time / len(posts)
 
