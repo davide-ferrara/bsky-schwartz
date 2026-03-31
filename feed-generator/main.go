@@ -6,13 +6,39 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/revrost/go-openrouter"
 )
+
+type ModelConfig struct {
+	Name     string
+	Provider string // "openrouter" or "siliconflow"
+	ModelID  string // model ID for the provider
+}
+
+var modelConfigs = []ModelConfig{
+	{Name: "gpt-4.1-mini", Provider: "openrouter", ModelID: "openai/gpt-4.1-mini"},
+	{Name: "mistral-14b", Provider: "openrouter", ModelID: "mistralai/ministral-14b-2512"},
+	{Name: "deepseek-v3.2", Provider: "siliconflow", ModelID: "deepseek-ai/DeepSeek-V3"},
+	{Name: "qwen3-vl-30b", Provider: "siliconflow", ModelID: "Qwen/Qwen3-VL-30B-A3B-Instruct"},
+}
+
+var modelFlag = flag.String("model", "", "Run analysis for specific model (partial name match)")
+var limitFlag = flag.Int("limit", 2, "Number of posts to analyze per model")
+var feedFlag = flag.String("feed", "./feed_20260330212226.json", "Path to feed JSON file")
+
+func filterModels(configs []ModelConfig, name string) []ModelConfig {
+	name = strings.ToLower(name)
+	var filtered []ModelConfig
+	for _, cfg := range configs {
+		if strings.Contains(strings.ToLower(cfg.Name), name) {
+			filtered = append(filtered, cfg)
+		}
+	}
+	return filtered
+}
 
 func main() {
 	flag.Parse()
@@ -21,28 +47,60 @@ func main() {
 		fmt.Fprintf(os.Stderr, "warning: .env not found: %v\n", err)
 	}
 
-	openrouterClient, err := GetAiClient()
-	if err != nil {
-		panic("failed to init AI Client: " + err.Error())
+	configs := modelConfigs
+	if *modelFlag != "" {
+		configs = filterModels(modelConfigs, *modelFlag)
+		if len(configs) == 0 {
+			fmt.Printf("No models matching '%s' found\n", *modelFlag)
+			return
+		}
+		fmt.Printf("Running analysis for %d model(s) matching '%s'\n", len(configs), *modelFlag)
 	}
 
-	models := []string{"openai/gpt-4.1-mini", "google/gemini-3.1-flash-lite-preview", "mistralai/mistral-small-2603", "qwen/qwen3.5-9b"}
-
-	// posts := DownloadFeed("./feed/conservation.json")
-
-	posts, err := LoadStaticPosts("./feed_20260330212226.json")
+	posts, err := LoadStaticPosts(*feedFlag)
 	if err != nil {
 		fmt.Println("Could not open JSON")
 		panic(err)
 	}
 
+	fmt.Println("========================================")
 	fmt.Println("Starting analysis...")
+	fmt.Printf("Loaded %d posts from %s\n", len(posts), *feedFlag)
+	fmt.Printf("Analyzing %d posts per model\n", *limitFlag)
+	fmt.Println("========================================")
 
-	limit := 10
+	for i, cfg := range configs {
+		fmt.Printf("\n[%d/%d] Model: %s (%s)\n", i+1, len(configs), cfg.Name, cfg.Provider)
+		fmt.Println("----------------------------------------")
 
-	if err := runAnalysisSync(openrouterClient, posts[:limit], models[3]); err != nil {
-		fmt.Println("Error running analysis with", models[3], ":", err)
+		var client AIClient
+		var err error
+
+		switch cfg.Provider {
+		case "openrouter":
+			client, err = GetOpenRouterClient()
+		case "siliconflow":
+			client, err = GetSiliconFlowClient()
+		default:
+			fmt.Printf("ERROR: Unknown provider: %s\n", cfg.Provider)
+			continue
+		}
+
+		if err != nil {
+			fmt.Printf("ERROR: Failed to init client: %v\n", err)
+			continue
+		}
+
+		parts := strings.Split(cfg.ModelID, "/")
+		filename := fmt.Sprintf("post_%s", parts[len(parts)-1])
+		if err := runAnalysisSync(client, posts[:*limitFlag], cfg.ModelID, filename); err != nil {
+			fmt.Printf("ERROR: Analysis failed: %v\n", err)
+		}
 	}
+
+	fmt.Println("\n========================================")
+	fmt.Println("All models processed.")
+	fmt.Println("========================================")
 }
 
 func DownloadFeed(path string) []Post {
@@ -82,36 +140,36 @@ func DownloadFeed(path string) []Post {
 	return posts
 }
 
-func runAnalysisSync(c *openrouter.Client, posts []Post, model string) error {
-	fmt.Println("Started post analysis...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
-	defer cancel()
+func runAnalysisSync(c AIClient, posts []Post, model string, filename string) error {
+	startTime := time.Now()
 
 	for i := range posts {
-		fmt.Printf("Calculating rating with model %v for post: %s\n", model, posts[i].AtURI)
+		postStart := time.Now()
+		fmt.Printf("  [Post %d/%d] Analyzing: %s\n", i+1, len(posts), truncate(posts[i].Text, 50))
+
+		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 
 		analysis, err := CalculateRating(ctx, c, model, &posts[i])
 		if err != nil {
 			posts[i].ValueAnalysis.Error = err.Error()
-			fmt.Println("Error in ValueAnalysis:", err)
+			fmt.Printf("  [Post %d/%d] ERROR: %v\n", i+1, len(posts), err)
 		} else {
 			posts[i].ValueAnalysis = *analysis
+			fmt.Printf("  [Post %d/%d] OK - Tokens: %d - Time: %v\n",
+				i+1, len(posts),
+				analysis.Stats.TotalTokens,
+				time.Since(postStart).Round(time.Millisecond))
 		}
 
-		time.Sleep(5 * time.Second)
+		cancel()
+		time.Sleep(3 * time.Second)
 	}
 
-	re := regexp.MustCompile(`^[^/]+/(.+)$`)
-	matches := re.FindStringSubmatch(model)
-	model = matches[1]
-
-	filename := fmt.Sprintf("post_%s", model)
 	if err := SavePostsToJson(filename, posts); err != nil {
 		return fmt.Errorf("save json error: %w", err)
 	}
 
-	fmt.Println("Analysis completed and saved to:", filename)
+	fmt.Printf("Completed in %v -> Saved to: %s\n", time.Since(startTime).Round(time.Millisecond), filename)
 	return nil
 }
 
@@ -151,10 +209,25 @@ func GetEnv(key string) string {
 	return v
 }
 
-func GetAiClient() (*openrouter.Client, error) {
+func GetOpenRouterClient() (AIClient, error) {
 	key := os.Getenv("OPEN_ROUTER_KEY")
 	if key == "" {
-		return &openrouter.Client{}, fmt.Errorf("OPEN_ROUTER_KEY not set")
+		return nil, fmt.Errorf("OPEN_ROUTER_KEY not set")
 	}
-	return openrouter.NewClient(key), nil
+	return NewOpenRouterClient(key), nil
+}
+
+func GetSiliconFlowClient() (AIClient, error) {
+	apiKey := os.Getenv("SILICONFLOW_API_KEY")
+	if apiKey == "" {
+		return nil, fmt.Errorf("SILICONFLOW_API_KEY not set")
+	}
+	return NewOpenAIClient(apiKey, "https://api.siliconflow.com/v1"), nil
+}
+
+func truncate(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen] + "..."
 }

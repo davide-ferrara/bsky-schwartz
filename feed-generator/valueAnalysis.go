@@ -5,11 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
-
-	"github.com/revrost/go-openrouter"
 )
+
+func cleanMarkdown(s string) string {
+	re := regexp.MustCompile("(?s)^```(?:json)?\\s*\\n?")
+	s = re.ReplaceAllString(strings.TrimSpace(s), "")
+	s = strings.TrimSuffix(s, "```")
+	return strings.TrimSpace(s)
+}
 
 func BuildPromptContent(post *Post) string {
 	content := map[string]interface{}{
@@ -35,7 +41,7 @@ func BuildPromptContent(post *Post) string {
 	return fmt.Sprintf("<post>\n%s\n</post>", jsonBytes)
 }
 
-func CalculateRating(ctx context.Context, client *openrouter.Client, model string, post *Post) (*ValueAnalysis, error) {
+func CalculateRating(ctx context.Context, client AIClient, model string, post *Post) (*ValueAnalysis, error) {
 	start := time.Now()
 
 	taskPrompt, err := os.ReadFile("./prompts/PROMPT_V3.md")
@@ -46,23 +52,14 @@ func CalculateRating(ctx context.Context, client *openrouter.Client, model strin
 	promptContent := BuildPromptContent(post)
 	prompt := fmt.Sprintf("%s\n\n%s", string(taskPrompt), promptContent)
 
-	resp, err := client.CreateChatCompletion(
-		ctx,
-		openrouter.ChatCompletionRequest{
-			Model:       model,
-			Temperature: 0.3,
-			Messages: []openrouter.ChatCompletionMessage{
-				openrouter.UserMessage(prompt),
-			},
-		},
-	)
+	resp, err := client.CreateChatCompletion(ctx, model, prompt)
 	if err != nil {
-		return nil, fmt.Errorf("openrouter error: %w", err)
+		return nil, fmt.Errorf("ai client error: %w", err)
 	}
 
 	elapsed := time.Since(start)
 
-	jsonStr := resp.Choices[0].Message.Content.Text
+	jsonStr := cleanMarkdown(resp.Content)
 
 	var result struct {
 		Rating    SchwartzValues `json:"Rating"`
@@ -75,10 +72,10 @@ func CalculateRating(ctx context.Context, client *openrouter.Client, model strin
 	stats := AIStats{
 		Model:            resp.Model,
 		ResponseTimeMs:   elapsed.Milliseconds(),
-		PromptTokens:     resp.Usage.PromptTokens,
-		CompletionTokens: resp.Usage.CompletionTokens,
-		TotalTokens:      resp.Usage.TotalTokens,
-		CostUsd:          resp.Usage.Cost,
+		PromptTokens:     resp.PromptTokens,
+		CompletionTokens: resp.CompletionTokens,
+		TotalTokens:      resp.TotalTokens,
+		CostUsd:          resp.CostUsd,
 		Provider:         resp.Provider,
 	}
 

@@ -9,7 +9,7 @@
 5. ACHIEVEMENT: Success according to social standards.
 6. POWER: Influence and the right to command.
 7. WEALTH: Control of material and social resources.
-8. REPUTATION: Security and power through maintaining one’s public image and
+8. REPUTATION: Security and power through maintaining one's public image and
    avoiding humiliation.
 9. PERSONAL SECURITY: Safety in one's immediate environment.
 10. SOCIETAL SECURITY: Safety and stability in the wider society.
@@ -34,26 +34,34 @@ supports the concept.
 
 ## Output
 
-ONE JSON DICTIONARY OF THE FOLLOWING FORMAT, WITHOUT MARKDOWN CODE BLOCKS OR
-BACKTICKS.
+OUTPUT EXACTLY ONE JSON OBJECT. DO NOT use markdown code blocks, backticks, or any formatting characters. Return ONLY the raw JSON.
 
-Rating is a dictionary of key value pairs, with each key being a concept and
-each value your rating for that concept and a brief explanation as _Reasoning_
-value: {"Rating": {"Concept": RATING}, "Reasoning": "YOUR BRIEF EXPLANATION"}
+Return a JSON object with exactly TWO fields:
+- "Rating": object with 19 key-value pairs (concept name: integer rating 0-6)
+- "Reasoning": a SINGLE STRING containing a brief summary of your reasoning
+
+CRITICAL: "Reasoning" MUST be a single string value, NOT an object. Do NOT include per-value reasoning fields.
+
+Example format:
+{"Rating": {"Reputation": 0, "Power": 2, "Wealth": 1, "Achievement": 0, "Pleasure": 0, "Independent thoughts": 0, "Independent actions": 0, "Stimulation": 3, "Personal security": 0, "Societal security": 0, "Tradition": 0, "Lawfulness": 0, "Respect": 0, "Humility": 0, "Responsibility": 5, "Caring": 4, "Equality": 5, "Nature": 0, "Tolerance": 3}, "Reasoning": "This is a single string explaining the overall reasoning."}
 
 ## Examples
 
-1. Post: I’ve always believed in the power of research to save lives and ensure
+1. Post: I've always believed in the power of research to save lives and ensure
    Americans get the care they need. Starting today, the firstever White House
-   Initiative on Women’s Health Research will work towards that goal, changing
-   how we approach and fund women’s health research.
+   Initiative on Women's Health Research will work towards that goal, changing
+   how we approach and fund women's health research.
 
-{"Rating": {"Reputation": 0, "Power": 0, "Wealth": 0, "Achievement": 0,
-"Pleasure": 0, "Independent thoughts": 0, "Independent actions": 0,
-"Stimulation": 0, "Personal security": 0, "Societal security": 0, "Tradition":
-0, "Lawfulness": 0, "Respect": 0, "Humility": 0, "Responsibility": 5, "Caring":
-4, "Equality": 5, "Nature": 0, "Tolerance": 3}, "Reasoning": "YOUR BRIEF
-EXPLANATION"}
+{"Rating": {"Reputation": 0, "Power": 0, "Wealth": 0, "Achievement": 0, "Pleasure": 0, "Independent thoughts": 0, "Independent actions": 0, "Stimulation": 0, "Personal security": 0, "Societal security": 0, "Tradition": 0, "Lawfulness": 0, "Respect": 0, "Humility": 0, "Responsibility": 5, "Caring": 4, "Equality": 5, "Nature": 0, "Tolerance": 3}, "Reasoning": "The post emphasizes responsibility through healthcare initiatives and caring for women's health needs."}
+
+2. Post: This little kid was carrying a white flag, and now he's dead. This guy
+   was also carrying a white flag, and he's been shot. I'm here filming for you,
+   and I'm in a lot of danger as well. People holding white flags are trying to
+   come out, and are scared from the snipers. If the claims of civilians with
+   white flags getting INTENTIONALLY targeted is true, this would be a WAR
+   CRIME.
+
+{"Rating": {"Reputation": 0, "Power": 0, "Wealth": 0, "Achievement": 0, "Pleasure": 0, "Independent thoughts": 0, "Independent actions": 0, "Stimulation": 0, "Personal security": 0, "Societal security": 0, "Tradition": 0, "Lawfulness": 0, "Respect": 0, "Humility": 0, "Responsibility": 0, "Caring": 6, "Equality": 5, "Nature": 0, "Tolerance": 3}, "Reasoning": "The post reflects strong caring and equality values through reporting on civilian suffering and potential war crimes."}
 
 2. Post: This little kid was carrying a white flag, and now he’s dead. This guy
    was also carrying a white flag, and he’s been shot. I’m here filming for you,

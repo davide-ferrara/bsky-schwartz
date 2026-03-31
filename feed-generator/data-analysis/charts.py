@@ -36,17 +36,17 @@ SCHWARTZ_CLUSTERS = {
 }
 
 MODEL_COLORS = {
-    "GPT": "#00A67E",
-    "GPT-4.1-mini": "#00A67E",
-    "Gemini": "#4285F4",
-    "Gemini-3.1-flash": "#4285F4",
-    "Claude": "#D97757",
-    "Claude-3": "#D97757",
-    "Qwen": "#6B5B95",
-    "Qwen-2.5": "#6B5B95",
+    "GPT": "#27AE60",
+    "GPT-4.1-mini": "#27AE60",
     "Mistral": "#FF6B35",
-    "Mistral-Small": "#FF6B35",
-    "Llama": "#00B4D8",
+    "Mistral-14b": "#FF6B35",
+    "ministral-14b": "#FF6B35",
+    "DeepSeek": "#2E86AB",
+    "DeepSeek-V3": "#2E86AB",
+    "deepseek-v3": "#2E86AB",
+    "Qwen": "#8E44AD",
+    "Qwen3": "#8E44AD",
+    "Qwen3-VL-30B": "#8E44AD",
 }
 
 
@@ -111,9 +111,15 @@ def plot_values_comparison(
         for val_name in available_vals[::-1]:
             for i, model in enumerate(models):
                 val_score = avg_values[model].get(val_name, 0)
-                model_color = MODEL_COLORS.get(
-                    model, MODEL_COLORS.get(model.split("-")[0], f"C{i}")
-                )
+
+                # Try exact match first, then capitalize first letter
+                model_color = MODEL_COLORS.get(model)
+                if model_color is None:
+                    # Try with first part capitalized
+                    first_part = model.split("-")[0]
+                    model_color = MODEL_COLORS.get(first_part.capitalize())
+                if model_color is None:
+                    model_color = f"C{i}"
 
                 pos = current_y + (i * bar_height)
 
