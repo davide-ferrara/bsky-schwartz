@@ -2,8 +2,12 @@ package views
 
 import "web/internal/models"
 
-templ SlidersPage(username string) {
+templ SlidersPage(username string, message string, weights map[string]float64) {
 	@Layout("Schwartz Values - Sovranità Algoritmica", username) {
+		if message != "" {
+			<div class="alert">{ message }</div>
+		}
+		
 		<hgroup>
 			<h1>Valori di Schwartz</h1>
 			<p>Regola i valori che preferisci all'interno del tuo Feed</p>
@@ -12,26 +16,13 @@ templ SlidersPage(username string) {
 		<form action="/preferences" method="post">
 			<article>
 				<header>Regola gli slider secondo le tue preferenze</header>
-				<div class="grid">
-					<div>
-						<h3>Autotrascendenza</h3>
-						@ValueGroup(models.GetValuesByCluster("Self-Transcendence"))
-					</div>
-					<div>
-						<h3>Conservazione</h3>
-						@ValueGroup(models.GetValuesByCluster("Conservation"))
-					</div>
-				</div>
-				<div class="grid">
-					<div>
-						<h3>Autoaffermazione</h3>
-						@ValueGroup(models.GetValuesByCluster("Self-Enhancement"))
-					</div>
-					<div>
-						<h3>Apertura al cambiamento</h3>
-						@ValueGroup(models.GetValuesByCluster("Openness to Change"))
-					</div>
-				</div>
+				for _, v := range models.SwartzValues {
+					if w, ok := weights[v.ID]; ok {
+						@ValueSlider(v, w)
+					} else {
+						@ValueSlider(v, 0.0)
+					}
+				}
 			</article>
 			
 			<article>

@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "web/internal/models"
 
-func ValueSlider(value models.SwartzValue) templ.Component {
+func ValueSlider(value models.SwartzValue, weight float64) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -62,9 +62,9 @@ func ValueSlider(value models.SwartzValue) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(formatFloat(value.Weight))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(formatFloat(weight))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components.templ`, Line: 8, Col: 111}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components.templ`, Line: 8, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -88,9 +88,9 @@ func ValueSlider(value models.SwartzValue) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(formatFloat(value.Weight))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(formatFloat(weight))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components.templ`, Line: 14, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components.templ`, Line: 14, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -117,7 +117,7 @@ func ValueSlider(value models.SwartzValue) templ.Component {
 	})
 }
 
-func ValueGroup(values []models.SwartzValue) templ.Component {
+func ValueGroup(values []models.SwartzValue, weights map[string]float64) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -143,9 +143,16 @@ func ValueGroup(values []models.SwartzValue) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, v := range values {
-			templ_7745c5c3_Err = ValueSlider(v).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+			if w, ok := weights[v.ID]; ok {
+				templ_7745c5c3_Err = ValueSlider(v, w).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = ValueSlider(v, 0.0).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")

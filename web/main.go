@@ -1,60 +1,95 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"web/internal/models"
 	"web/views"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
+	store := cookie.NewStore([]byte("secret"))
+	r.Use(sessions.Sessions("mysession", store))
 
 	// Serve static files
 	r.Static("/static", "./static")
 
 	r.GET("/", func(c *gin.Context) {
-		component := views.SlidersPage("")
-		component.Render(c.Request.Context(), c.Writer)
+		session := sessions.Default(c)
+
+		// Get weights from session
+		weights := make(map[string]float64)
+		if w := session.Get("weights"); w != nil {
+			if data, ok := w.([]byte); ok {
+				json.Unmarshal(data, &weights)
+			}
+		}
+
+		// Get flash message
+		var message string
+		if msg := session.Get("message"); msg != nil {
+			message = msg.(string)
+			session.Delete("message")
+			session.Save()
+		}
+
+		component := views.SlidersPage("", message, weights)
+		if err := component.Render(c.Request.Context(), c.Writer); err != nil {
+			panic(err)
+		}
 	})
 
 	r.GET("/values", func(c *gin.Context) {
 		component := views.ValuesPage()
-		component.Render(c.Request.Context(), c.Writer)
+		if err := component.Render(c.Request.Context(), c.Writer); err != nil {
+			panic(err)
+		}
 	})
 
 	r.GET("/login", func(c *gin.Context) {
 		component := views.LoginPage()
-		component.Render(c.Request.Context(), c.Writer)
+		if err := component.Render(c.Request.Context(), c.Writer); err != nil {
+			panic(err)
+		}
 	})
 
 	r.POST("/preferences", func(c *gin.Context) {
-		// Parse form data
-		formData := make(map[string]string)
+		session := sessions.Default(c)
+
+		// Parse form data into map
+		weights := make(map[string]float64)
 		for _, value := range models.SwartzValues {
-			formData[value.ID] = c.PostForm(value.ID)
+			if val := c.PostForm(value.ID); val != "" {
+				var f float64
+				if _, err := fmt.Sscanf(val, "%f", &f); err == nil {
+					weights[value.ID] = f
+				}
+			}
 		}
 
-		// Map to SchwartzWeights
-		weights := models.MapFormToWeights(formData)
+		// Save to session
+		if data, err := json.Marshal(weights); err == nil {
+			session.Set("weights", data)
+			session.Set("message", "Preferenze salvate con successo!")
+			session.Save()
+		}
 
-		// Log for now (TODO: save to database)
-		fmt.Printf("Received preferences: %+v\n", weights)
-
-		// Return success response
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "success",
-			"message": "Preferenze salvate con successo",
-			"weights": weights,
-		})
+		c.Redirect(http.StatusFound, "/")
 	})
 
 	r.GET("/auth/bsky", func(c *gin.Context) {
-		// TODO: Implement Bluesky OAuth
+		// TODO: Implement Bluesky AppPassword Auth
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 	})
 
-	r.Run(":8080")
+	if err := r.Run(":8080"); err != nil {
+		panic(err)
+	}
 }

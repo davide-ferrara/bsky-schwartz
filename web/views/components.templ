@@ -2,16 +2,16 @@ package views
 
 import "web/internal/models"
 
-templ ValueSlider(value models.SwartzValue) {
+templ ValueSlider(value models.SwartzValue, weight float64) {
 	<label>
 		{ value.Name }
-		<span style="float: right; color: var(--muted-color);" id={ "value-" + value.ID }>{ formatFloat(value.Weight) }</span>
+		<span style="float: right; color: var(--muted-color);" id={ "value-" + value.ID }>{ formatFloat(weight) }</span>
 		<div style="display: flex; align-items: center; gap: 0.5rem;">
 			<span style="color: var(--muted-color); font-size: 0.875rem;">meno</span>
 			<input 
 				type="range" 
 				name={ value.ID }
-				value={ formatFloat(value.Weight) }
+				value={ formatFloat(weight) }
 				step="0.25" 
 				min="-1" 
 				max="1"
@@ -23,10 +23,14 @@ templ ValueSlider(value models.SwartzValue) {
 	</label>
 }
 
-templ ValueGroup(values []models.SwartzValue) {
+templ ValueGroup(values []models.SwartzValue, weights map[string]float64) {
 	<div>
 		for _, v := range values {
-			@ValueSlider(v)
+			if w, ok := weights[v.ID]; ok {
+				@ValueSlider(v, w)
+			} else {
+				@ValueSlider(v, 0.0)
+			}
 		}
 	</div>
 }
