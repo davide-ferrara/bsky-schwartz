@@ -1,11 +1,14 @@
-.PHONY: build run clean
+.PHONY: build run clean dev
 
 build:
 	templ generate
-	go build -o bin/web
+	go build -o bin/web .
 
 run: build
 	./bin/web
+
+dev:
+	air
 
 clean:
 	rm -rf bin
