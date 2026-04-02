@@ -1,6 +1,6 @@
 package views
 
-import "web/internal/models"
+import "bsky-schwartz/internal/models"
 
 templ ValueSlider(value models.SwartzValue, weight float64) {
 	<label>
@@ -33,4 +33,20 @@ templ ValueGroup(values []models.SwartzValue, weights map[string]float64) {
 			}
 		}
 	</div>
+}
+
+templ MessageModal(messageType string, message string) {
+	<dialog id="message-modal" open>
+		<article style="text-align: center;">
+			if messageType == "success" {
+				<h3 style="color: var(--form-valid-color);">✓ Successo</h3>
+			} else {
+				<h3 style="color: var(--form-invalid-color);">✕ Errore</h3>
+			}
+			<p>{ message }</p>
+			<footer style="display: flex; justify-content: center;">
+				<button onclick="closeModal('message-modal')">Ok</button>
+			</footer>
+		</article>
+	</dialog>
 }

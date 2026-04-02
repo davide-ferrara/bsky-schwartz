@@ -1,14 +1,14 @@
 package views
 
-import "web/internal/models"
+import "bsky-schwartz/internal/models"
 
-templ SlidersPage(username string, message string, weights map[string]float64) {
+templ SlidersPage(username string, messageType string, message string, weights map[string]float64) {
 	@Layout("Schwartz Values - Sovranità Algoritmica", username) {
 		if message != "" {
-			<div class="alert">{ message }</div>
+			@MessageModal(messageType, message)
 		}
 		
-		<hgroup>
+		<hgroup style="text-align: center;">
 			<h1>Valori di Schwartz</h1>
 			<p>Regola i valori che preferisci all'interno del tuo Feed</p>
 		</hgroup>
@@ -25,8 +25,8 @@ templ SlidersPage(username string, message string, weights map[string]float64) {
 				}
 			</article>
 			
-			<article>
-				<button type="submit">Salva preferenze</button>
+			<article style="text-align: center;">
+				<button type="submit" style="width: auto;">Salva preferenze</button>
 			</article>
 		</form>
 	}

@@ -1,5 +1,3 @@
-// Package main - Algoritmi di selezione post
-// FILE PRINCIPALE DA MODIFICARE per il tuo feed
 package main
 
 import (

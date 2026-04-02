@@ -1,0 +1,35 @@
+# Binari
+bin/
+tmp/
+
+# Air
+.air.toml.bak
+
+# Template generati
+*_templ.go
+
+# Dipendenze
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test
+*.test
+*.out
+coverage.txt
+
+# Environment
+.env
+.env.local
+.env.*.local

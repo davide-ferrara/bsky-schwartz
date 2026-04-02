@@ -12,13 +12,15 @@ templ Layout(title string, username string) {
 <body>
 			<nav class="container">
 				<ul>
-					<li><a href="/" class="contrast"><strong>Sovranità Algoritmica</strong></a></li>
+        if username != "" {
+					<li><a href="/" class="contrast"><strong>Ciao, {username}</strong></a></li>
+        } 
 				</ul>
 				<ul>
 					<li><a href="/values" class="contrast">I Valori</a></li>
 					<li><a href="https://github.com/davide-ferrara/bsky-schwartz" class="contrast">GitHub</a></li>
 					if username != "" {
-						<li><a href="/logout">Logout</a></li>
+						<li><form action="/logout" method="post" style="display:inline"><button type="submit" class="secondary outline">Logout</button></form></li>
 					} else {
 						<li><a href="/login" role="button">Accedi con Bluesky</a></li>
 					}
@@ -37,6 +39,16 @@ templ Layout(title string, username string) {
 						}
 					});
 				});
+
+				function showModal(id) {
+					var modal = document.getElementById(id);
+					if (modal) modal.showModal();
+				}
+
+				function closeModal(id) {
+					var modal = document.getElementById(id);
+					if (modal) modal.close();
+				}
 			</script>
 		</body>
 	</html>

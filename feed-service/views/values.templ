@@ -1,9 +1,9 @@
 package views
 
-import "web/internal/models"
+import "bsky-schwartz/internal/models"
 
-templ ValuesPage() {
-	@Layout("I Valori di Schwartz - Sovranità Algoritmica", "") {
+templ ValuesPage(username string) {
+	@Layout("I Valori di Schwartz - Sovranità Algoritmica", username) {
 		<hgroup>
 			<h1>I 19 Valori di Schwartz</h1>
 			<p>La Teoria dei Valori Basici di Schwartz identifica 19 valori universali che guidano il comportamento umano.</p>

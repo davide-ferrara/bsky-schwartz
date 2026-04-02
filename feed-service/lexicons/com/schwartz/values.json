@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "com.schwartz.values",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "main",
+      "record": {
+        "type": "object",
+        "required": ["weights", "updatedAt"],
+        "properties": {
+          "weights": {
+            "type": "object",
+            "properties": {
+              "sd_thought": { "type": "number" },
+              "sd_action": { "type": "number" },
+              "stimulation": { "type": "number" },
+              "hedonism": { "type": "number" },
+              "achievement": { "type": "number" },
+              "dominance": { "type": "number" },
+              "resources": { "type": "number" },
+              "face": { "type": "number" },
+              "personal_sec": { "type": "number" },
+              "societal_sec": { "type": "number" },
+              "tradition": { "type": "number" },
+              "rule_conf": { "type": "number" },
+              "inter_conf": { "type": "number" },
+              "humility": { "type": "number" },
+              "caring": { "type": "number" },
+              "dependability": { "type": "number" },
+              "universalism": { "type": "number" },
+              "nature": { "type": "number" },
+              "tolerance": { "type": "number" }
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

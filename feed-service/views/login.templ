@@ -1,0 +1,36 @@
+package views
+
+templ LoginPage(messageType string, message string) {
+	@Layout("Login - Sovranità Algoritmica", "") {
+		if message != "" {
+			@MessageModal(messageType, message)
+		}
+		<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
+			<article style="max-width: 400px;">
+				<div style="margin-bottom: 2rem;">
+					<img src="/static/bluesky-logo.png" alt="Bluesky Logo" style="width: 80px; height: 80px;"/>
+				</div>
+				
+				<hgroup>
+					<h1>Accedi</h1>
+					<p>Collega il tuo account Bluesky per personalizzare i tuoi valori</p>
+				</hgroup>
+				
+				<form action="/login" method="post">
+					<label>
+						Handle
+						<input type="text" name="handle" placeholder="user.bsky.social" required/>
+					</label>
+					
+					<label>
+						App Password
+						<input type="password" name="appPassword" placeholder="xxxx-xxxx-xxxx-xxxx" required/>
+						<small>Genera una App Password da <a href="https://bsky.app/settings/app-passwords" target="_blank">bsky.app/settings/app-passwords</a></small>
+					</label>
+					
+					<button type="submit">Accedi</button>
+				</form>
+			</article>
+		</div>
+	}
+}
