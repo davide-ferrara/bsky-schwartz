@@ -2,40 +2,106 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
+	"sort"
 	"strconv"
+	"strings"
+	"sync"
+
+	"bsky-schwartz/internal/models"
+	"bsky-schwartz/types"
 
 	"github.com/bluesky-social/indigo/api/bsky"
 )
 
 // AlgoHandler - Firma funzione per un algoritmo di feed
-type AlgoHandler func(ctx context.Context, limit int, cursor string) (*bsky.FeedGetFeedSkeleton_Output, error)
+type AlgoHandler func(ctx context.Context, limit int, cursor string, userDID string) (*bsky.FeedGetFeedSkeleton_Output, error)
 
 // Algos - Registro degli algoritmi disponibili
-// Aggiungi il tuo feed qui con un nome unico
-// Esempio URI risultante: at://did:plc:xxx/app.bsky.feed.generator/mio-feed
 var Algos = map[string]AlgoHandler{
-	"schwartz": feedStatico,
+	"values": feedValueBased,
 }
 
 // =============================================================================
-// CONFIGURAZIONE FEED STATICO
+// POST DATABASE
 // =============================================================================
-// Inserisci qui gli URI dei post che vuoi mostrare nel tuo feed
-// Formato: at://did:plc:XXX/app.bsky.feed.post/YYY
-// Puoi trovare gli URI usando l'API di Bluesky o strumenti come https://bsky.app
-var postStatici = []string{
-	"at://did:plc:t6ubj2wlhc34awzcymh3qpur/app.bsky.feed.post/3mi363eeufs2g",
+
+var (
+	postsOnce sync.Once
+	posts     []types.Post
+	postsErr  error
+)
+
+// LoadFeed - Carica i post da feed_test.json (singleton)
+func LoadFeed() ([]types.Post, error) {
+	postsOnce.Do(func() {
+		data, err := os.ReadFile("./feed_test.json")
+		if err != nil {
+			postsErr = err
+			return
+		}
+		if err := json.Unmarshal(data, &posts); err != nil {
+			postsErr = err
+			return
+		}
+	})
+	return posts, postsErr
 }
 
 // =============================================================================
-// FINE CONFIGURAZIONE - Non modificare sotto se non necessario
+// SCORING
 // =============================================================================
 
-// feedStatico - Restituisce i post dalla lista hardcoded
-// Supporta paginazione con cursor (indice del post)
-func feedStatico(ctx context.Context, limit int, cursor string) (*bsky.FeedGetFeedSkeleton_Output, error) {
-	// Calcola indice di partenza dal cursor
+func jsonKeyToWeightKey(jsonKey string) string {
+	return strings.ToLower(strings.ReplaceAll(jsonKey, " ", "_"))
+}
+
+// CalculateScore - Calcola lo score di un post rispetto ai weights
+func CalculateScore(posts []types.Post, weights map[string]float64) {
+	for i := range posts {
+		var score int
+		for key, rating := range posts[i].ValueAnalysis.Rating {
+			score += rating * int(weights[strings.ToLower(key)])
+		}
+		posts[i].ValueAnalysis.Score = score
+		fmt.Println("DEBUG: ", posts[i].ValueAnalysis.Score)
+	}
+}
+
+// =============================================================================
+// FEED GENERATOR
+// =============================================================================
+
+// feedValueBased - Restituisce i post ordinati per score
+func feedValueBased(ctx context.Context, limit int, cursor string, userDID string) (*bsky.FeedGetFeedSkeleton_Output, error) {
+	// Recupera weights utente dalla memoria condivisa
+	weights := GlobalUserWeights.Get(userDID)
+	if weights == nil {
+		// Weight neutri (tutti a 0) - feed non personalizzato
+		weights = make(map[string]float64)
+		for _, v := range models.SwartzValues {
+			weights[v.ID] = 0.0
+		}
+		fmt.Printf("ℹ️ Nessun weights per DID=%s, uso pesi neutri\n", userDID)
+	} else {
+		fmt.Printf("✓ Weights trovati per DID=%s (%d valori)\n", userDID, len(weights))
+	}
+
+	// Carica i post dal file (singleton)
+	posts, err := LoadFeed()
+	if err != nil {
+		return nil, fmt.Errorf("loading feed: %w", err)
+	}
+
+	CalculateScore(posts, weights)
+
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].ValueAnalysis.Score > posts[j].ValueAnalysis.Score
+	})
+
+	// Paginazione
 	startIdx := 0
 	if cursor != "" {
 		idx, err := strconv.Atoi(cursor)
@@ -45,48 +111,33 @@ func feedStatico(ctx context.Context, limit int, cursor string) (*bsky.FeedGetFe
 		startIdx = idx
 	}
 
-	// Calcola indice di fine rispettando il limit
 	endIdx := startIdx + limit
-	if endIdx > len(postStatici) {
-		endIdx = len(postStatici)
+	if endIdx > len(posts) {
+		endIdx = len(posts)
 	}
 
 	// Estrai slice di post per questa pagina
-	postSlice := postStatici[startIdx:endIdx]
+	postSlice := posts[startIdx:endIdx]
 
 	// Converte in formato skeleton (solo URI)
 	feed := make([]*bsky.FeedDefs_SkeletonFeedPost, len(postSlice))
-	for i, uri := range postSlice {
+	for i, sp := range postSlice {
 		feed[i] = &bsky.FeedDefs_SkeletonFeedPost{
-			Post: uri,
+			Post: sp.AtURI,
 		}
 	}
 
 	// Genera cursor per pagina successiva
-	// nil se siamo arrivati alla fine della lista
 	var nextCursor *string
-	if endIdx < len(postStatici) {
+	if endIdx < len(posts) {
 		c := strconv.Itoa(endIdx)
 		nextCursor = &c
 	}
 
+	// posts := make([]*bsky.FeedDefs_SkeletonFeedPost, len(feed))
+	// t := "10"
 	return &bsky.FeedGetFeedSkeleton_Output{
 		Cursor: nextCursor,
 		Feed:   feed,
 	}, nil
 }
-
-// Aggiungi qui altre funzioni per feed aggiuntivi se necessario
-// Esempio:
-//
-// var altriPost = []string{...}
-//
-// func feedAlternativo(ctx context.Context, limit int, cursor string) (*bsky.FeedGetFeedSkeleton_Output, error) {
-//     ...stessa logica di feedStatico ma con altriPost...
-// }
-//
-// Poi registralo in Algos:
-// var Algos = map[string]AlgoHandler{
-//     "mio-feed": feedStatico,
-//     "altro-feed": feedAlternativo,
-// }

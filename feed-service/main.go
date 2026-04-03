@@ -1,4 +1,3 @@
-// Package main - Applicazione unificata: Feed Generator + Web App
 package main
 
 import (

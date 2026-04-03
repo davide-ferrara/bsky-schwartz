@@ -1,4 +1,3 @@
-// Package main - Tipid e memoria condivisa
 package main
 
 import "sync"

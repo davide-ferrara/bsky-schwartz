@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"bsky-schwartz/types"
+
 	"github.com/joho/godotenv"
 )
 
@@ -103,7 +105,7 @@ func main() {
 	fmt.Println("========================================")
 }
 
-func DownloadFeed(path string) []Post {
+func DownloadFeed(path string) []types.Post {
 	ctx := context.Background()
 	handle := GetEnv("BSKY_HANDLE")
 	appPassword := GetEnv("BSKY_APP_PASSWORD")
@@ -119,7 +121,7 @@ func DownloadFeed(path string) []Post {
 		panic(err)
 	}
 
-	var posts []Post
+	var posts []types.Post
 	for _, postURL := range postUrls.Urls {
 		post, err := bskyClient.GetPostUrl(ctx, postURL)
 		if err != nil {
@@ -140,7 +142,7 @@ func DownloadFeed(path string) []Post {
 	return posts
 }
 
-func runAnalysisSync(c AIClient, posts []Post, model string, filename string) error {
+func runAnalysisSync(c AIClient, posts []types.Post, model string, filename string) error {
 	startTime := time.Now()
 
 	for i := range posts {
@@ -173,8 +175,8 @@ func runAnalysisSync(c AIClient, posts []Post, model string, filename string) er
 	return nil
 }
 
-func LoadStaticPosts(path string) ([]Post, error) {
-	var posts []Post
+func LoadStaticPosts(path string) ([]types.Post, error) {
+	var posts []types.Post
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return posts, nil
@@ -187,8 +189,8 @@ func LoadStaticPosts(path string) ([]Post, error) {
 	return posts, nil
 }
 
-func LoadPostURLs(path string) (PostURLs, error) {
-	var postURLs PostURLs
+func LoadPostURLs(path string) (types.PostURLs, error) {
+	var postURLs types.PostURLs
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return postURLs, nil

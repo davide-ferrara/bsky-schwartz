@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"bsky-schwartz/types"
 )
 
 func cleanMarkdown(s string) string {
@@ -17,7 +19,7 @@ func cleanMarkdown(s string) string {
 	return strings.TrimSpace(s)
 }
 
-func BuildPromptContent(post *Post) string {
+func BuildPromptContent(post *types.Post) string {
 	content := map[string]interface{}{
 		"text": post.Text,
 	}
@@ -41,7 +43,7 @@ func BuildPromptContent(post *Post) string {
 	return fmt.Sprintf("<post>\n%s\n</post>", jsonBytes)
 }
 
-func CalculateRating(ctx context.Context, client AIClient, model string, post *Post) (*ValueAnalysis, error) {
+func CalculateRating(ctx context.Context, client AIClient, model string, post *types.Post) (*types.ValueAnalysis, error) {
 	start := time.Now()
 
 	taskPrompt, err := os.ReadFile("./prompts/PROMPT_V3.md")
@@ -62,14 +64,14 @@ func CalculateRating(ctx context.Context, client AIClient, model string, post *P
 	jsonStr := cleanMarkdown(resp.Content)
 
 	var result struct {
-		Rating    SchwartzValues `json:"Rating"`
-		Reasoning string         `json:"Reasoning"`
+		Rating    types.SchwartzValues `json:"Rating"`
+		Reasoning string               `json:"Reasoning"`
 	}
 	if err := json.Unmarshal([]byte(jsonStr), &result); err != nil {
 		return nil, fmt.Errorf("unmarshal error: %w, json: %s", err, jsonStr)
 	}
 
-	stats := AIStats{
+	stats := types.AIStats{
 		Model:            resp.Model,
 		ResponseTimeMs:   elapsed.Milliseconds(),
 		PromptTokens:     resp.PromptTokens,
@@ -79,7 +81,7 @@ func CalculateRating(ctx context.Context, client AIClient, model string, post *P
 		Provider:         resp.Provider,
 	}
 
-	return &ValueAnalysis{
+	return &types.ValueAnalysis{
 		Rating:    result.Rating,
 		Reasoning: result.Reasoning,
 		Stats:     stats,

@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"time"
 
+	"bsky-schwartz/types"
+
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
 	_ "github.com/bluesky-social/indigo/api/bsky"
@@ -36,19 +38,19 @@ func NewClient(handle, appPassword string) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) GetPost(ctx context.Context, handle string, key string) (Post, error) {
+func (c *Client) GetPost(ctx context.Context, handle string, key string) (types.Post, error) {
 	atURI, err := c.GetAtUri(ctx, handle, key)
 	if err != nil {
-		return Post{}, err
+		return types.Post{}, err
 	}
 
 	result, err := bsky.FeedGetPosts(ctx, c.client, []string{atURI})
 	if err != nil {
-		return Post{}, err
+		return types.Post{}, err
 	}
 
 	if len(result.Posts) == 0 {
-		return Post{}, fmt.Errorf("post not found: %s", atURI)
+		return types.Post{}, fmt.Errorf("post not found: %s", atURI)
 	}
 
 	postView := result.Posts[0]
@@ -76,7 +78,7 @@ func (c *Client) GetPost(ctx context.Context, handle string, key string) (Post, 
 		url = ""
 	}
 
-	return Post{
+	return types.Post{
 		URL:         url,
 		AtURI:       atURI,
 		Text:        record.Text,
@@ -94,7 +96,7 @@ func (c *Client) GetPost(ctx context.Context, handle string, key string) (Post, 
 }
 
 // https://bsky.app/profile/{handle or DID}/post/{rkey}
-func (c *Client) GetPostUrl(ctx context.Context, url string) (Post, error) {
+func (c *Client) GetPostUrl(ctx context.Context, url string) (types.Post, error) {
 	re := regexp.MustCompile(`^https://bsky\.app/profile/([^/]+)/post/([^/]+)$`)
 	matches := re.FindStringSubmatch(url)
 
@@ -103,7 +105,7 @@ func (c *Client) GetPostUrl(ctx context.Context, url string) (Post, error) {
 
 	post, err := c.GetPost(ctx, handle, key)
 	if err != nil {
-		return Post{}, err
+		return types.Post{}, err
 	}
 
 	return post, nil
@@ -121,13 +123,13 @@ func (c *Client) GetAtUri(ctx context.Context, handle string, key string) (strin
 	return atURI, nil
 }
 
-func extractImagesView(postView *bsky.FeedDefs_PostView) []PostImage {
-	var images []PostImage
+func extractImagesView(postView *bsky.FeedDefs_PostView) []types.PostImage {
+	var images []types.PostImage
 	if postView.Embed == nil || postView.Embed.EmbedImages_View == nil {
 		return images
 	}
 	for _, img := range postView.Embed.EmbedImages_View.Images {
-		images = append(images, PostImage{
+		images = append(images, types.PostImage{
 			Alt:   img.Alt,
 			Image: img.Fullsize,
 		})
@@ -135,8 +137,8 @@ func extractImagesView(postView *bsky.FeedDefs_PostView) []PostImage {
 	return images
 }
 
-func extractLinksView(postView *bsky.FeedDefs_PostView) []PostLink {
-	var links []PostLink
+func extractLinksView(postView *bsky.FeedDefs_PostView) []types.PostLink {
+	var links []types.PostLink
 	if postView.Embed == nil || postView.Embed.EmbedExternal_View == nil {
 		return links
 	}
@@ -145,7 +147,7 @@ func extractLinksView(postView *bsky.FeedDefs_PostView) []PostLink {
 	if ext.Thumb != nil {
 		thumb = *ext.Thumb
 	}
-	links = append(links, PostLink{
+	links = append(links, types.PostLink{
 		Uri:         ext.Uri,
 		Title:       ext.Title,
 		Description: ext.Description,
@@ -154,13 +156,13 @@ func extractLinksView(postView *bsky.FeedDefs_PostView) []PostLink {
 	return links
 }
 
-func extractImages(post *bsky.FeedPost) []PostImage {
-	var images []PostImage
+func extractImages(post *bsky.FeedPost) []types.PostImage {
+	var images []types.PostImage
 	if post.Embed == nil || post.Embed.EmbedImages == nil {
 		return images
 	}
 	for _, img := range post.Embed.EmbedImages.Images {
-		images = append(images, PostImage{
+		images = append(images, types.PostImage{
 			Alt:   img.Alt,
 			Image: img.Image.Ref.String(),
 		})
@@ -168,8 +170,8 @@ func extractImages(post *bsky.FeedPost) []PostImage {
 	return images
 }
 
-func extractLinks(post *bsky.FeedPost) []PostLink {
-	var links []PostLink
+func extractLinks(post *bsky.FeedPost) []types.PostLink {
+	var links []types.PostLink
 	if post.Embed == nil || post.Embed.EmbedExternal == nil {
 		return links
 	}
@@ -178,7 +180,7 @@ func extractLinks(post *bsky.FeedPost) []PostLink {
 	if ext.Thumb != nil {
 		thumb = ext.Thumb.Ref.String()
 	}
-	links = append(links, PostLink{
+	links = append(links, types.PostLink{
 		Uri:         ext.Uri,
 		Title:       ext.Title,
 		Description: ext.Description,
@@ -187,23 +189,23 @@ func extractLinks(post *bsky.FeedPost) []PostLink {
 	return links
 }
 
-func extractFacets(post *bsky.FeedPost) []PostFacet {
-	var facets []PostFacet
+func extractFacets(post *bsky.FeedPost) []types.PostFacet {
+	var facets []types.PostFacet
 	for _, facet := range post.Facets {
 		for _, feature := range facet.Features {
 			switch {
 			case feature.RichtextFacet_Link != nil:
-				facets = append(facets, PostFacet{
+				facets = append(facets, types.PostFacet{
 					Type:  "link",
 					Value: feature.RichtextFacet_Link.Uri,
 				})
 			case feature.RichtextFacet_Mention != nil:
-				facets = append(facets, PostFacet{
+				facets = append(facets, types.PostFacet{
 					Type:  "mention",
 					Value: feature.RichtextFacet_Mention.Did,
 				})
 			case feature.RichtextFacet_Tag != nil:
-				facets = append(facets, PostFacet{
+				facets = append(facets, types.PostFacet{
 					Type:  "tag",
 					Value: feature.RichtextFacet_Tag.Tag,
 				})

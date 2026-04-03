@@ -152,3 +152,39 @@ func ResolveDID(ctx context.Context, client *xrpc.Client, handle string) (string
 	}
 	return identity.Did, nil
 }
+
+func DeleteWeights(ctx context.Context, client *xrpc.Client, handle string) error {
+	// Check if record already exists
+	existingCID := ""
+	resp, err := atproto.RepoGetRecord(ctx, client, "", "com.schwartz.values", handle, "main")
+	if err == nil && resp.Cid != nil {
+		// Record exists, get its CID for swap
+		existingCID = *resp.Cid
+		fmt.Println("Existing record found, CID:", existingCID)
+	} else {
+		// Record doesn't exist yet, create new
+		fmt.Println("No weights where saved to PDS, returning...")
+		return nil
+	}
+
+	input := &atproto.RepoDeleteRecord_Input{
+		Repo:       handle,
+		Collection: "com.schwartz.values",
+		Rkey:       "main",
+	}
+
+	// If record exists, specify CID for atomic swap
+	if existingCID != "" {
+		input.SwapRecord = &existingCID
+	}
+
+	// Delete to PDS
+	_, err = atproto.RepoDeleteRecord(ctx, client, input)
+	if err != nil {
+		return fmt.Errorf("failed to save weights to PDS: %w", err)
+	}
+
+	fmt.Println("Weights removed successfully!")
+
+	return nil
+}

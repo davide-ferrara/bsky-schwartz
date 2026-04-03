@@ -1,12 +1,16 @@
 module bsky-schwartz
 
-go 1.25.2
+go 1.26
+
+replace bsky-schwartz/types => ../types
 
 require (
+	bsky-schwartz/types v0.0.0-00010101000000-000000000000
 	github.com/a-h/templ v0.3.1001
 	github.com/bluesky-social/indigo v0.0.0-20260318212431-cbaa83aee9dd
 	github.com/gin-contrib/sessions v1.1.0
 	github.com/gin-gonic/gin v1.12.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/whyrusleeping/cbor-gen v0.2.1-0.20241030202151-b7a6831be65e
 )

@@ -1,4 +1,3 @@
-// Package main - Server HTTP unificato per Feed Generator e Web App
 package main
 
 import (
@@ -18,6 +17,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func NewServer(cfg *Config, logger *slog.Logger) http.Handler {
@@ -52,6 +52,7 @@ func NewServer(cfg *Config, logger *slog.Logger) http.Handler {
 	webRouter.GET("/login", LoginGetHandler)
 	webRouter.POST("/login", LoginPostHandler)
 	webRouter.POST("/logout", LogoutHandler)
+	webRouter.GET("/delete", DeleteWeightsHanlder)
 	webRouter.GET("/values", ValuesHandler)
 	webRouter.POST("/preferences", PreferencesHandler)
 
@@ -72,7 +73,7 @@ func NewServer(cfg *Config, logger *slog.Logger) http.Handler {
 	})
 }
 
-// Handler per Web App (Gin)
+// ==== Handler per Web App (Gin) =====
 
 func GetSessionString(session sessions.Session, name string) string {
 	if val := session.Get(name); val != nil {
@@ -126,7 +127,9 @@ func RootHandler(c *gin.Context) {
 		weights = make(map[string]float64)
 		if w := session.Get("weights"); w != nil {
 			if data, ok := w.([]byte); ok {
-				json.Unmarshal(data, &weights)
+				if err := json.Unmarshal(data, &weights); err != nil {
+					fmt.Printf("Could not Marshal: %v", err)
+				}
 			}
 		}
 	}
@@ -142,7 +145,11 @@ func RootHandler(c *gin.Context) {
 		messageType = mt.(string)
 		session.Delete("messageType")
 	}
-	session.Save()
+	if err := session.Save(); err != nil {
+		fmt.Printf("Could not save session, trying clearing it: %v", err)
+		session.Clear()
+		return
+	}
 
 	component := views.SlidersPage(username, messageType, message, weights)
 	if err := component.Render(c.Request.Context(), c.Writer); err != nil {
@@ -163,7 +170,12 @@ func LoginGetHandler(c *gin.Context) {
 		messageType = mt.(string)
 		session.Delete("messageType")
 	}
-	session.Save()
+
+	if err := session.Save(); err != nil {
+		fmt.Printf("Could not save session, trying clearing it: %v", err)
+		session.Clear()
+		return
+	}
 
 	component := views.LoginPage(messageType, message)
 	if err := component.Render(c.Request.Context(), c.Writer); err != nil {
@@ -334,7 +346,41 @@ func PreferencesHandler(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
-// Feed Generator Handlers
+func DeleteWeightsHanlder(c *gin.Context) {
+	session := sessions.Default(c)
+
+	user, err := GetUser(session)
+	if err != nil {
+		fmt.Println(err)
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	client, err := bsky.NewClient(user.Handle, user.AppPassword)
+	if err != nil {
+		fmt.Println("ERRORE LOGIN - bsky.NewClient:", err)
+		session.Set("message", "Handle o App Password non validi")
+		session.Set("messageType", "error")
+		session.Save()
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	ctx := context.Background()
+	err = bsky.DeleteWeights(ctx, &client, user.Handle)
+	if err != nil {
+		session.Set("message", "Errore nell'eliminare il record")
+		session.Set("messageType", "error")
+		session.Save()
+		c.Redirect(http.StatusPermanentRedirect, "/profile")
+		return
+	}
+
+	c.Redirect(http.StatusPermanentRedirect, "/preferences")
+	return
+}
+
+// ==== Feed Generator Handlers ====
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
@@ -377,6 +423,35 @@ func handleDescribeFeedGenerator(cfg *Config) http.HandlerFunc {
 
 func handleGetFeedSkeleton(cfg *Config, logger *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var userDID string
+
+		// TODO: IMPROVE JWT PASRING
+		if auth := r.Header.Get("Authorization"); auth != "" {
+			fmt.Println(auth)
+
+			parts := strings.Split(auth, " ")
+			tokenStr := parts[1]
+
+			parser := jwt.NewParser()
+			token, _, err := parser.ParseUnverified(tokenStr, jwt.MapClaims{})
+			if err != nil {
+				logger.Warn("Error in parsing JWT")
+			}
+
+			claims, ok := token.Claims.(jwt.MapClaims)
+			if !ok {
+				logger.Warn("Error in claming JWT")
+			}
+
+			// Il DID è nel campo "iss" (issuer) del token
+			userDID, ok = claims["iss"].(string)
+			if !ok {
+				logger.Warn("Unauthenticated feed reqeust")
+			}
+		}
+
+		fmt.Println("REQEUST FROM:", userDID)
+
 		feedParam := r.URL.Query().Get("feed")
 		if feedParam == "" {
 			writeError(w, http.StatusBadRequest, "missing feed parameter")
@@ -409,7 +484,8 @@ func handleGetFeedSkeleton(cfg *Config, logger *slog.Logger) http.HandlerFunc {
 		}
 		cursor := r.URL.Query().Get("cursor")
 
-		result, err := algo(r.Context(), limit, cursor)
+		// Chiamata all'algoritmo di generazione del feed
+		result, err := algo(r.Context(), limit, cursor, userDID)
 		if err != nil {
 			logger.Error("algo error", "algo", rkey, "err", err)
 			writeError(w, http.StatusInternalServerError, "internal error")
