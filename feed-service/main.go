@@ -15,6 +15,13 @@ func main() {
 	// Logger strutturato
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
+	// Inizializza database
+	if err := InitDatabase(); err != nil {
+		logger.Error("failed to initialize database", "err", err)
+		os.Exit(1)
+	}
+	defer CloseDatabase()
+
 	// Carica configurazione
 	cfg, err := LoadConfig()
 	if err != nil {

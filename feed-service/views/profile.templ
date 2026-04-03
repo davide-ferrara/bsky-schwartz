@@ -1,0 +1,36 @@
+package views
+
+templ ProfilePage(username, handle string, messageType string, message string) {
+	@Layout("Profilo - Sovranità Algoritmica", username) {
+		if message != "" {
+			@MessageModal(messageType, message)
+		}
+		<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
+			<article style="max-width: 400px;">
+				<div style="margin-bottom: 2rem;">
+					<img src="/static/bluesky-logo.png" alt="Bluesky Logo" style="width: 60px; height: 60px;"/>
+				</div>
+				
+				<hgroup>
+					<h1>Profilo</h1>
+					<p>Informazioni del tuo account Bluesky</p>
+				</hgroup>
+				
+				<div style="text-align: left; margin: 2rem 0;">
+					<p><strong>Username:</strong> { username }</p>
+					<p><strong>Handle:</strong> { handle }</p>
+				</div>
+
+				<div style="margin-top: 2rem;">
+					<form action="/delete-weights" method="post" onsubmit="return confirm('Sei sicuro di voler eliminare i tuoi pesi salvati su Bluesky?')">
+						<button type="submit" style="background-color: #ff4444; color: white;">Elimina i miei dati</button>
+					</form>
+				</div>
+				
+				<div style="margin-top: 1rem;">
+					<a href="/">Torna alla home</a>
+				</div>
+			</article>
+		</div>
+	}
+}

@@ -8,15 +8,17 @@ require (
 	bsky-schwartz/types v0.0.0-00010101000000-000000000000
 	github.com/a-h/templ v0.3.1001
 	github.com/bluesky-social/indigo v0.0.0-20260318212431-cbaa83aee9dd
+	github.com/bytedance/gopkg v0.1.3
 	github.com/gin-contrib/sessions v1.1.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1
+	github.com/mattn/go-sqlite3 v1.14.40
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/whyrusleeping/cbor-gen v0.2.1-0.20241030202151-b7a6831be65e
 )
 
 require (
-	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic v1.15.0 // indirect
 	github.com/bytedance/sonic/loader v0.5.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
@@ -65,7 +67,6 @@ require (
 	github.com/multiformats/go-multibase v0.2.0 // indirect
 	github.com/multiformats/go-multihash v0.2.3 // indirect
 	github.com/multiformats/go-varint v0.0.7 // indirect
-	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/polydawn/refmt v0.89.1-0.20221221234430-40501e09de1f // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect

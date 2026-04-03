@@ -1,10 +1,13 @@
-.PHONY: help build run dev clean test
+.PHONY: help build run dev clean test tunnel
 
 build: templ ## Build del binario
 	go build -o bin/feed-service
 
 run: build ## Build ed esegui
 	./bin/feed-service
+
+tunnel: build ## Esegui con Cloudflare Tunnel
+	cloudflared tunnel run
 
 dev: ## Sviluppo con hot reload (Air)
 	air

@@ -66,7 +66,6 @@ func CalculateScore(posts []types.Post, weights map[string]float64) {
 			score += rating * int(weights[strings.ToLower(key)])
 		}
 		posts[i].ValueAnalysis.Score = score
-		fmt.Println("DEBUG: ", posts[i].ValueAnalysis.Score)
 	}
 }
 
@@ -84,9 +83,6 @@ func feedValueBased(ctx context.Context, limit int, cursor string, userDID strin
 		for _, v := range models.SwartzValues {
 			weights[v.ID] = 0.0
 		}
-		fmt.Printf("ℹ️ Nessun weights per DID=%s, uso pesi neutri\n", userDID)
-	} else {
-		fmt.Printf("✓ Weights trovati per DID=%s (%d valori)\n", userDID, len(weights))
 	}
 
 	// Carica i post dal file (singleton)
