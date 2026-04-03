@@ -33,3 +33,6 @@ coverage.txt
 .env
 .env.local
 .env.*.local
+
+# SQLite
+data.db
